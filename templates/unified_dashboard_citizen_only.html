@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Citizen Dashboard | CrimeGuard Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { 50: '#f8fafc', 100: '#f1f5f9', 800: '#1e293b', 900: '#0f172a' },
+            accent: { 500: '#e67e22', 600: '#c2410c' },
+            success: { 50: '#f0fdf4', 500: '#22c55e' },
+            error: { 50: '#fef2f2', 500: '#ef4444' },
+            warning: { 50: '#fffbeb', 500: '#f59e0b' }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    .card { @apply bg-white border border-gray-200 rounded-lg shadow-sm; }
+    .btn { @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold transition; }
+    .btn-primary { @apply bg-primary-800 text-white hover:bg-primary-700; }
+    .btn-outline { @apply border border-primary-800 text-primary-800 hover:bg-primary-50; }
+    .btn-danger { @apply border border-error-500 text-error-500 hover:bg-error-50; }
+    .chip { @apply text-xs px-2 py-1 rounded; }
+
+    .modal-backdrop { 
+      @apply fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
+    .modal-backdrop.open { 
+      display: flex;
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-panel { 
+      @apply bg-white rounded-2xl shadow-2xl w-full max-w-3xl p-6 mx-4;
+      transform: scale(0.95);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-backdrop.open .modal-panel { 
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    /* Small screens tweaks */
+    @media (max-width: 640px) {
+      .modal-panel { 
+        @apply mx-2 p-4;
+        max-width: calc(100% - 1rem);
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-primary-900">
+  <!-- NAVBAR -->
+  <header class="bg-white shadow-sm sticky top-0 z-40">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-4">
+        <img src="/static/images/newlogo.png" style="height: 210px; width: auto;">
+        
+      </div>
+
+      <div class="flex items-center space-x-5">
+        <a href="/home" class="text-sm text-primary-600 hover:text-primary-800">Home</a>
+
+        <!-- Notification bell -->
+        <div class="relative">
+          <button id="notifBtn" aria-expanded="false" class="relative p-1 text-primary-700 hover:text-primary-900">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V4a2 2 0 10-4 0v1.341C8.67 6.165 8 7.388 8 9v5.159c0 .538-.214 1.055-.595 1.436L6 17h5m4 0a3 3 0 01-6 0"/></svg>
+            <span id="notifBadge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 rounded-full hidden">0</span>
+          </button>
+
+          <div id="notifMenu" class="hidden absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-md">
+            <div class="p-3 border-b font-semibold text-primary-800">Notifications</div>
+            <div id="notifList" class="max-h-64 overflow-y-auto p-1">
+              <p class="text-sm text-primary-600 p-3">No new notifications.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- User menu -->
+        <div class="relative">
+          <button id="userBtn" aria-expanded="false" class="flex items-center text-primary-700 hover:text-primary-900">
+            <img id="avatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="w-8 h-8 rounded-full mr-2">
+            <span id="topName" class="text-sm font-semibold">Citizen</span>
+            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+
+          <div id="userMenu" class="hidden absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-md">
+            <div class="px-4 py-3 border-b">
+              <p id="ddName" class="text-sm font-semibold text-primary-800">Citizen</p>
+              <p id="ddId" class="text-xs text-primary-600">ID: —</p>
+            </div>
+            <a href="/profile/edit" id="profileBtn" class="block w-full text-left px-4 py-2 text-sm text-primary-700 hover:bg-gray-50">My Profile</a>
+            <a href="/help_center" id="myReportsBtn" class="w-full text-left px-4 py-2 text-sm text-primary-700 hover:bg-gray-50">Help and Support</a>
+            <div class="border-t my-1"></div>
+            <a href="/logout" class="block px-4 py-2 text-sm text-error-500 hover:bg-error-50">Sign Out</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="bg-primary-800 text-white py-8">
+    <div class="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 px-4 sm:px-6 lg:px-8">
+      <div>
+        <h1 class="text-2xl lg:text-3xl font-bold">Welcome back, <span id="heroName">Citizen</span></h1>
+        <p id="heroMeta" class="text-primary-200 mt-1"></p>
+      </div>
+
+      <div class="mt-3 lg:mt-0 flex flex-col sm:flex-row gap-3">
+        <button id="openReportBtn" class="inline-flex items-center px-5 py-2.5 rounded-md font-semibold bg-accent-500 hover:bg-accent-600 text-white transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Report New Crime
+        </button>
+        <a href="/resources" class="inline-flex items-center px-5 py-2.5 rounded-md font-semibold border border-white/30 text-white bg-white/10 hover:bg-white/20 transition">
+          Safety Resources
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <!-- STATS -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="card p-5">
+        <p class="text-sm text-primary-600">My Reports</p>
+        <p id="statCases" class="text-3xl font-bold mt-1">—</p>
+      </div>
+      <div class="card p-5">
+        <p class="text-sm text-primary-600">Pending Reviews</p>
+        <p id="statPending" class="text-3xl font-bold mt-1">—</p>
+      </div>
+      <div class="card p-5">
+        <p class="text-sm text-primary-600">Resolved Cases</p>
+        <p id="statResolved" class="text-3xl font-bold mt-1 text-success-500">—</p>
+      </div>
+    </section>
+    <!-- REPORT CREATE MODAL -->
+  <div id="reportModal" class="modal-backdrop">
+    <div class="modal-panel w-full max-w-2xl">
+      <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
+        <h3 class="text-xl font-bold text-primary-800 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-accent-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Report New Crime
+        </h3>
+        <div class="flex gap-2">
+          <button id="reportHelpBtn" class="px-3 py-1.5 text-sm font-medium text-primary-600 hover:text-primary-800 hover:bg-primary-50 rounded-lg transition">Help</button>
+          <button id="closeReport" class="p-1.5 text-primary-600 hover:text-primary-900 hover:bg-gray-100 rounded-lg transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <form id="reportForm" class="space-y-5">
+        <div>
+          <label class="block text-sm font-semibold text-primary-700 mb-2">Title <span class="text-red-500">*</span></label>
+          <input id="reportTitle" type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition outline-none" placeholder="Brief title (e.g., Theft near market)" required>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-primary-700 mb-2">Category <span class="text-red-500">*</span></label>
+          <select id="reportCategory" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition outline-none bg-white">
+            <option value="theft">Theft</option>
+            <option value="assault">Assault</option>
+            <option value="fraud">Fraud</option>
+            <option value="robbery">Robbery</option>
+            <option value="vandalism">Vandalism</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-primary-700 mb-2">Location <span class="text-red-500">*</span></label>
+          <input id="reportLocation" type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition outline-none" placeholder="Address or landmark" required>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-primary-700 mb-2">Description <span class="text-red-500">*</span></label>
+          <textarea id="reportDescription" rows="5" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition outline-none resize-none" placeholder="Describe what happened in detail..." required></textarea>
+        </div>
+
+        <div class="flex justify-between items-center pt-4 border-t border-gray-200">
+          <div id="reportResult" class="text-sm font-medium"></div>
+          <div class="flex gap-3">
+            <button type="button" id="submitReport" class="px-5 py-2.5 border border-primary-800 text-primary-800 rounded-lg font-semibold hover:bg-primary-50 transition">Submit</button>
+            <button type="button" id="submitReportPrimary" class="px-5 py-2.5 bg-accent-500 text-white rounded-lg font-semibold hover:bg-accent-600 transition shadow-md">Submit & Notify</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- EDIT/UPDATE CASE MODAL -->
+  <div id="editModal" class="modal-backdrop">
+    <div class="modal-panel w-full max-w-2xl">
+      <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
+        <h3 class="text-xl font-bold text-primary-800 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-accent-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+          </svg>
+          Edit Report
+        </h3>
+        <button id="closeEdit" class="p-1.5 text-primary-600 hover:text-primary-900 hover:bg-gray-100 rounded-lg transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <form id="editForm" class="space-y-5">
+        <input type="hidden" id="editCaseId">
+        <div>
+          <label class="block text-sm font-semibold text-primary-700 mb-2">Title <span class="text-red-500">*</span></label>
+          <input id="editTitle" type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition outline-none" required>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-primary-700 mb-2">Category <span class="text-red-500">*</span></label>
+          <select id="editCategory" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition outline-none bg-white">
+            <option value="theft">Theft</option>
+            <option value="assault">Assault</option>
+            <option value="fraud">Fraud</option>
+            <option value="robbery">Robbery</option>
+            <option value="vandalism">Vandalism</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-primary-700 mb-2">Location <span class="text-red-500">*</span></label>
+          <input id="editLocation" type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition outline-none" required>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-primary-700 mb-2">Description <span class="text-red-500">*</span></label>
+          <textarea id="editDescription" rows="5" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition outline-none resize-none" required></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-primary-700 mb-2">Status</label>
+          <select id="editStatus" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition outline-none bg-white">
+            <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Resolved">Resolved</option>
+            <option value="Closed">Closed</option>
+          </select>
+        </div>
+
+        <div class="flex justify-between items-center pt-4 border-t border-gray-200">
+          <div id="editResult" class="text-sm font-medium"></div>
+          <div class="flex gap-3">
+            <button type="button" id="saveEdit" class="px-6 py-2.5 bg-accent-500 text-white rounded-lg font-semibold hover:bg-accent-600 transition shadow-md">Save Changes</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  
+
+    <!-- PROFILE & ACTIONS -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="card p-6 lg:col-span-2">
+        <h3 class="text-lg font-bold text-primary-800 mb-4">My Details</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div>
+            <p class="text-primary-600">Full Name</p>
+            <p id="dName" class="font-semibold">—</p>
+          </div>
+          <div>
+            <p class="text-primary-600">Citizen ID</p>
+            <p id="dId" class="font-semibold">—</p>
+          </div>
+          <div>
+            <p class="text-primary-600">Email</p>
+            <p id="dEmail" class="font-semibold">—</p>
+          </div>
+          <div>
+            <p class="text-primary-600">Phone</p>
+            <p id="dPhone" class="font-semibold">—</p>
+          </div>
+          <div class="md:col-span-2">
+            <p class="text-primary-600"></p>
+            <p id="dAddress" class="font-semibold"></p>
+          </div>
+          <div class="md:col-span-2">
+            <p class="text-primary-600">Last Login</p>
+            <p id="dLastLogin" class="font-semibold">—</p>
+          </div>
+        </div>
+      </div>
+        
+      <!-- VIEW CASE MODAL -->
+  <div id="viewCaseModal" class="modal-backdrop">
+    <div class="modal-panel w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-200 sticky top-0 bg-white z-10">
+        <h3 class="text-xl font-bold text-primary-800 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-accent-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          Case Details
+        </h3>
+        <div class="flex gap-2">
+          <button id="editCaseBtn" class="px-4 py-2 border border-primary-800 text-primary-800 rounded-lg font-semibold hover:bg-primary-50 transition">Edit</button>
+          <button id="closeViewCase" class="p-1.5 text-primary-600 hover:text-primary-900 hover:bg-gray-100 rounded-lg transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div id="caseDetails" class="space-y-4 text-sm text-primary-800">
+        <div class="flex items-center justify-center py-8">
+          <div class="text-center">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-500 mx-auto mb-2"></div>
+            <p class="text-primary-600">Loading case details...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+      <div class="card p-6">
+        <h3 class="text-lg font-bold text-primary-800 mb-4">Quick Actions</h3>
+        <div class="space-y-3">
+          <button id="viewReportsBtn" class="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-md font-semibold bg-primary-800 hover:bg-primary-700 text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6h13v6M9 11V5a2 2 0 012-2h10a2 2 0 012 2v6"/></svg>
+            View My Reports
+          </button>
+
+          <button id="downloadReportsBtn" class="w-full inline-flex items-center justify-center px-4 py-2.5 rounded-md font-semibold border border-accent-500 text-accent-600 bg-white hover:bg-accent-50">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-accent-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Download Reports
+          </button>
+        </div>
+      </div>
+    </section>
+    
+
+    <!-- REPORTS -->
+    <section id="reportsSection" class="card p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-bold text-primary-800">My Reports</h3>
+        <div id="casesCount" class="text-sm text-primary-600">—</div>
+      </div>
+
+      <div id="casesList" class="space-y-4">
+        <p class="text-sm text-primary-600">Loading your reports…</p>
+      </div>
+    </section>
+    <!-- DOWNLOAD REPORTS MODAL -->
+    <div id="downloadReportsModal" class="modal-backdrop">
+      <div class="modal-panel w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-200 sticky top-0 bg-white z-10">
+          <h3 class="text-xl font-bold text-primary-800 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-accent-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            Download Reports
+          </h3>
+          <button id="closeDownloadReports" class="p-1.5 text-primary-600 hover:text-primary-900 hover:bg-gray-100 rounded-lg transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <div class="space-y-6">
+          <!-- Export Options -->
+          <div>
+            <h4 class="text-lg font-semibold text-primary-800 mb-4">Export Format</h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <button onclick="downloadReports('pdf')" class="border border-gray-200 bg-white rounded-lg p-4 hover:border-accent-500 hover:bg-accent-50 transition text-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-500 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                </svg>
+                <h5 class="font-semibold text-gray-900 mb-1">PDF Document</h5>
+                <p class="text-xs text-gray-600">Download as PDF file</p>
+              </button>
+              <button onclick="downloadReports('csv')" class="border border-gray-200 bg-white rounded-lg p-4 hover:border-accent-500 hover:bg-accent-50 transition text-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-green-500 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <h5 class="font-semibold text-gray-900 mb-1">CSV Spreadsheet</h5>
+                <p class="text-xs text-gray-600">Download as CSV file</p>
+              </button>
+              <button onclick="downloadReports('excel')" class="border border-gray-200 bg-white rounded-lg p-4 hover:border-accent-500 hover:bg-accent-50 transition text-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-blue-500 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <h5 class="font-semibold text-gray-900 mb-1">Excel Workbook</h5>
+                <p class="text-xs text-gray-600">Download as Excel file</p>
+              </button>
+            </div>
+          </div>
+
+          <!-- Filter Options -->
+          <div>
+            <h4 class="text-lg font-semibold text-primary-800 mb-4">Report Filters</h4>
+            <div class="space-y-4">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Date Range</label>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="text-xs text-gray-600 mb-1 block">From Date</label>
+                    <input type="date" id="exportFromDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition outline-none">
+                  </div>
+                  <div>
+                    <label class="text-xs text-gray-600 mb-1 block">To Date</label>
+                    <input type="date" id="exportToDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition outline-none">
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Status Filter</label>
+                <select id="exportStatus" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition outline-none bg-white">
+                  <option value="all">All Statuses</option>
+                  <option value="pending">Pending</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="resolved">Resolved</option>
+                  <option value="closed">Closed</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Category Filter</label>
+                <select id="exportCategory" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition outline-none bg-white">
+                  <option value="all">All Categories</option>
+                  <option value="theft">Theft</option>
+                  <option value="assault">Assault</option>
+                  <option value="fraud">Fraud</option>
+                  <option value="robbery">Robbery</option>
+                  <option value="vandalism">Vandalism</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Download Status -->
+          <div id="downloadStatus" class="text-sm"></div>
+
+          <!-- Information -->
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div class="flex items-start">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-600 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <div>
+                <h5 class="font-semibold text-blue-900 mb-1">Export Information</h5>
+                <ul class="text-xs text-blue-800 space-y-1 list-disc list-inside">
+                  <li>Reports will include all case details, status, dates, and descriptions</li>
+                  <li>PDF format is best for printing and sharing</li>
+                  <li>CSV/Excel formats are ideal for data analysis</li>
+                  <li>Exports are generated on-demand and may take a few moments</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MY REPORTS POPUP MODAL -->
+    <div id="myReportsModal" class="modal-backdrop">
+      <div class="modal-panel w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-200 sticky top-0 bg-white z-10">
+          <h3 class="text-xl font-bold text-primary-800 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-accent-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6h13v6M9 11V5a2 2 0 012-2h10a2 2 0 012 2v6"/>
+            </svg>
+            My Reports
+          </h3>
+          <button id="closeMyReports" class="p-1.5 text-primary-600 hover:text-primary-900 hover:bg-gray-100 rounded-lg transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <div id="myReportsList" class="space-y-4">
+          <div class="flex items-center justify-center py-8">
+            <div class="text-center">
+              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-500 mx-auto mb-2"></div>
+              <p class="text-primary-600">Loading reports...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DELETE CONFIRM MODAL -->
+  <div id="deleteModal" class="modal-backdrop">
+    <div class="modal-panel w-full max-w-md">
+      <div class="flex items-center gap-3 mb-4 pb-4 border-b border-gray-200">
+        <div class="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold text-primary-800">Confirm Deletion</h3>
+          <p class="text-sm text-primary-600 mt-1">This action cannot be undone</p>
+        </div>
+      </div>
+      <p class="text-sm text-primary-700 mb-6 leading-relaxed">Are you sure you want to delete this case? All associated data will be permanently removed.</p>
+      <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+        <button id="cancelDelete" class="px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition">Cancel</button>
+        <button id="confirmDelete" class="px-5 py-2.5 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition shadow-md">Delete</button>
+      </div>
+      <div id="deleteResult" class="text-sm font-medium mt-4"></div>
+    </div>
+  </div>
+  </main>
+
+  
+
+  
+
+
+  <!-- Footer -->
+  <footer class="bg-primary-900 text-white py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <!-- Company Info -->
+            <div class="col-span-1 md:col-span-2">
+                <div class="flex items-center mb-4">
+                    <svg class="h-8 w-8 text-white mr-3" viewBox="0 0 40 40" fill="currentColor">
+                    </svg>
+                    <div>
+                      <img src="/static/images/newlogo1.png" style="height: 100px; width: 250;">
+                    </div>
+                </div>
+                <p class="text-primary-200 mb-4">Secure authentication gateway ensuring safe access to CrimeGuard Pro's comprehensive crime management ecosystem.</p>
+                <div class="flex space-x-4">
+                  
+                    <a href="javascript:void(0)" class="text-primary-300 hover:text-white transition-smooth">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/>
+                        </svg>
+                    </a>
+                    <a href="javascript:void(0)" class="text-primary-300 hover:text-white transition-smooth">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div>
+                <h4 class="text-lg font-inter font-semibold mb-4">Quick Links</h4>
+                <ul class="space-y-2">
+                    <li><a href="homepage_government_technology_platform.html" class="text-primary-200 hover:text-white transition-smooth">Home</a></li>
+                    <li><a href="/login" class="text-primary-200 hover:text-white transition-smooth">Login</a></li>
+                    <li><a href="document_center_secure_file_management.html" class="text-primary-200 hover:text-white transition-smooth">Documents</a></li>
+                    <li><a href="/analytics" class="text-primary-200 hover:text-white transition-smooth">Reports</a></li>
+                </ul>
+            </div>
+
+            <!-- Support -->
+            <div>
+              <h4 class="text-lg font-inter font-semibold mb-4">Support</h4>
+              <ul class="space-y-2">
+                  <li><a href="/help_center" class="small-muted">Help Center</a>
+                  </li>
+                  <li><a href="/contact" class="text-primary-200 hover:text-white transition-smooth">Contact Us</a></li>
+                  <li><a href="/privacy_policy" class="text-primary-200 hover:text-white transition-smooth">Privacy Policy</a></li>
+                  <li><a href="/terms_of_service" class="text-primary-200 hover:text-white transition-smooth">Terms of Service</a></li>
+                  <li><a href="/accessibility" class="text-primary-200 hover:text-white transition-smooth">Accessibility</a></li>
+              </ul>
+          </div>
+      </div>
+
+        <div class="border-t border-primary-700 mt-8 pt-8 text-center">
+            <p class="text-primary-200">&copy; 2025 CrimeGuard Pro. All Rights Reserved. | Secure authentication for justice and transparency.</p>
+        </div>
+    </div>
+</footer>
+
+  <!-- All logic -->
+  <script>
+    (function () {
+      const el = id => document.getElementById(id);
+
+      // Accept multiple token keys
+      const tokenKeys = ['authToken', 'token', 'jwt', 'accessToken'];
+      function readToken() {
+        for (const k of tokenKeys) {
+          const v = localStorage.getItem(k);
+          if (v) return { token: v, key: k };
+        }
+        return { token: null, key: null };
+      }
+      const { token } = readToken();
+      if (!token) {
+        console.warn('No token found; redirecting to /login');
+        return window.location.href = '/login';
+      }
+
+      // small helpers
+      function openModal(m) { if (!m) return; m.style.display='flex'; setTimeout(()=>m.classList.add('open'), 10); }
+      function closeModal(m) { if (!m) return; m.classList.remove('open'); setTimeout(()=>m.style.display='none', 220); }
+      async function safeJson(res) { try { return await res.json(); } catch (e){ return null; } }
+
+      // UI toggles
+      el('userBtn').addEventListener('click', ()=> el('userMenu').classList.toggle('hidden'));
+      document.addEventListener('click', e => { if (!e.target.closest('#userBtn') && el('userMenu') && !el('userMenu').contains(e.target)) el('userMenu').classList.add('hidden'); });
+
+      el('notifBtn').addEventListener('click', ()=> { el('notifMenu').classList.toggle('hidden'); if (!el('notifMenu').classList.contains('hidden')) el('notifBadge').classList.add('hidden'); });
+      document.addEventListener('click', e => { if (!e.target.closest('#notifBtn') && el('notifMenu') && !el('notifMenu').contains(e.target)) el('notifMenu').classList.add('hidden'); });
+
+      // modal backdrop click to close
+      ['reportModal','viewCaseModal','editModal','deleteModal','myReportsModal','downloadReportsModal'].forEach(id=>{
+        const m = el(id); if (!m) return;
+        m.addEventListener('click', (ev) => { if (ev.target === m) closeModal(m); });
+      });
+
+      // hook buttons
+      el('openReportBtn').addEventListener('click', ()=> openModal(el('reportModal')));
+      el('closeReport').addEventListener('click', ()=> closeModal(el('reportModal')));
+      el('closeViewCase').addEventListener('click', ()=> closeModal(el('viewCaseModal')));
+      el('closeEdit').addEventListener('click', ()=> closeModal(el('editModal')));
+      el('cancelDelete').addEventListener('click', ()=> closeModal(el('deleteModal')));
+      el('closeMyReports').addEventListener('click', ()=> closeModal(el('myReportsModal')));
+      el('downloadReportsBtn').addEventListener('click', ()=> openModal(el('downloadReportsModal')));
+      el('closeDownloadReports').addEventListener('click', ()=> closeModal(el('downloadReportsModal')));
+      el('viewReportsBtn').addEventListener('click', ()=> document.getElementById('reportsSection').scrollIntoView({ behavior: 'smooth' }));
+      
+      
+
+      // Real-time notifications from cases
+      let notifications = [];
+      let lastNotificationCheck = null;
+      
+      async function fetchNotifications() {
+        try {
+          const res = await fetch('/api/me', { headers: { 'Authorization': `Bearer ${token}` } });
+          if (!res.ok) return;
+          const data = await res.json();
+          const u = data.user || {};
+          const citizenId = u._id || u.id;
+          if (!citizenId) return;
+          
+          const casesRes = await fetch(`/api/cases/citizen/${citizenId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+          if (!casesRes.ok) return;
+          const casesData = await casesRes.json();
+          const cases = casesData.cases || [];
+          
+          // Build notifications from cases
+          notifications = [];
+          const now = new Date();
+          
+          cases.forEach(c => {
+            const status = (c.status || '').toLowerCase();
+            const updated = c.updated_at ? new Date(c.updated_at) : (c.created_at ? new Date(c.created_at) : null);
+            if (!updated) return;
+            
+            // Check if case was recently updated (within last 24 hours)
+            const hoursAgo = (now - updated) / (1000 * 60 * 60);
+            if (hoursAgo > 24) return;
+            
+            let msg = '';
+            let timeStr = '';
+            
+            if (status === 'resolved') {
+              msg = `Case "${c.title || 'Untitled'}" has been resolved.`;
+              timeStr = hoursAgo < 1 ? 'Just now' : hoursAgo < 2 ? '1 hour ago' : `${Math.floor(hoursAgo)} hours ago`;
+            } else if (status === 'pending') {
+              msg = `Case "${c.title || 'Untitled'}" is pending review.`;
+              timeStr = hoursAgo < 1 ? 'Just now' : hoursAgo < 2 ? '1 hour ago' : `${Math.floor(hoursAgo)} hours ago`;
+            } else if (status === 'in progress' || status === 'ongoing') {
+              msg = `Case "${c.title || 'Untitled'}" is now in progress.`;
+              timeStr = hoursAgo < 1 ? 'Just now' : hoursAgo < 2 ? '1 hour ago' : `${Math.floor(hoursAgo)} hours ago`;
+            } else if (c.updated_at && c.created_at && c.updated_at !== c.created_at) {
+              msg = `Case "${c.title || 'Untitled'}" has been updated.`;
+              timeStr = hoursAgo < 1 ? 'Just now' : hoursAgo < 2 ? '1 hour ago' : `${Math.floor(hoursAgo)} hours ago`;
+            }
+            
+            if (msg) {
+              notifications.push({ msg, time: timeStr, caseId: c._id || c.id, status });
+            }
+          });
+          
+          // Sort by most recent (store timestamp for proper sorting)
+          notifications.forEach(n => {
+            const caseData = cases.find(c => (c._id || c.id) === n.caseId);
+            if (caseData) {
+              n.timestamp = caseData.updated_at ? new Date(caseData.updated_at).getTime() : 
+                           (caseData.created_at ? new Date(caseData.created_at).getTime() : 0);
+            } else {
+              n.timestamp = 0;
+            }
+          });
+          notifications.sort((a, b) => b.timestamp - a.timestamp);
+          
+          renderNotifications();
+          lastNotificationCheck = now;
+        } catch (err) {
+          console.error('fetchNotifications error', err);
+        }
+      }
+      
+      function renderNotifications() {
+        const list = el('notifList'); if (!list) return;
+        if (!notifications.length) { 
+          list.innerHTML = '<p class="text-sm text-primary-600 p-3">No new notifications.</p>'; 
+          el('notifBadge').classList.add('hidden'); 
+          return; 
+        }
+        el('notifBadge').textContent = notifications.length; 
+        el('notifBadge').classList.remove('hidden');
+        list.innerHTML = notifications.slice(0, 10).map(n => {
+          const statusColor = n.status === 'resolved' ? 'text-green-600' : n.status === 'pending' ? 'text-yellow-600' : 'text-blue-600';
+          return `<div class="p-3 border-b hover:bg-primary-50 cursor-pointer" onclick="viewCase('${n.caseId}')">
+            <p class="text-sm text-primary-800">${n.msg}</p>
+            <p class="text-xs ${statusColor} mt-1">${n.time}</p>
+          </div>`;
+        }).join('');
+      }
+      
+      // Fetch notifications every 30 seconds
+      fetchNotifications();
+      setInterval(fetchNotifications, 30000);
+
+      // --- API interactions ---
+      async function loadCitizen() {
+        try {
+          const res = await fetch('/api/me', { headers: { 'Authorization': `Bearer ${token}` } });
+          if (!res.ok) { tokenKeys.forEach(k=>localStorage.removeItem(k)); return window.location.href='/login'; }
+          const data = await res.json();
+          const u = data.user || {};
+          const name = (u.name || `${u.first_name||''} ${u.last_name||''}`).trim() || 'Citizen';
+          el('heroName').textContent = name;
+          el('topName').textContent = name;
+          el('dName').textContent = name;
+          el('dId').textContent = u._id || u.id || '—';
+          el('ddId').textContent = `ID: ${u._id || u.id || '—'}`;
+          el('dEmail').textContent = u.email || '—';
+          el('dPhone').textContent = u.phone || '—';
+          
+          el('dLastLogin').textContent = u.last_login ? new Date(u.last_login).toLocaleString() : (u.updated_at?new Date(u.updated_at).toLocaleString():'—');
+          if (u.avatar_url) el('avatar').src = u.avatar_url;
+          // load cases
+          await loadCases(u._id || u.id);
+          await fetchNotifications();
+        } catch (err) {
+          console.error('loadCitizen error', err);
+          tokenKeys.forEach(k=>localStorage.removeItem(k));
+          window.location.href = '/login';
+        }
+      }
+
+      async function loadCases(citizenId) {
+        const listEl = el('casesList');
+        try {
+          if (!citizenId) { listEl.innerHTML = '<p class="text-sm text-primary-600">No reports yet.</p>'; return; }
+          const res = await fetch(`/api/cases/citizen/${citizenId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+          if (!res.ok) { listEl.innerHTML = '<p class="text-sm text-primary-600">Unable to load reports.</p>'; return; }
+          const data = await res.json();
+          const cases = data.cases || [];
+          el('casesCount').textContent = `${cases.length} total`;
+          el('statCases').textContent = cases.length;
+          el('statPending').textContent = cases.filter(c => (c.status||'').toLowerCase() === 'pending').length;
+          el('statResolved').textContent = cases.filter(c => (c.status||'').toLowerCase() === 'resolved').length;
+          if (!cases.length) { listEl.innerHTML = '<p class="text-sm text-primary-600">No reports yet.</p>'; return; }
+          listEl.innerHTML = cases.map(c => {
+            const priorityClass = (c.priority || '').toLowerCase() === 'high' ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700';
+            const statusLower = (c.status || '').toLowerCase();
+            const statusClass = statusLower === 'resolved' ? 'bg-green-500 text-white' : statusLower === 'pending' ? 'bg-yellow-400 text-black' : 'bg-gray-300 text-gray-800';
+            const created = c.created_at ? new Date(c.created_at).toLocaleString() : (c.createdAt? new Date(c.createdAt).toLocaleString() : '—');
+            return `
+              <div class="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition">
+                <div class="flex justify-between items-start gap-4">
+                  <div class="flex-1">
+                    <div class="flex items-center mb-1 space-x-2">
+                      <span class="chip ${priorityClass}">${c.priority || 'Normal'}</span>
+                      <span class="chip ${statusClass}">${c.status || 'Open'}</span>
+                    </div>
+                    <h4 class="font-semibold text-primary-900">${c.title || 'Untitled Report'}</h4>
+                    <p class="text-sm text-primary-600 mt-1">Filed on ${created}</p>
+                  </div>
+                  <div class="flex-shrink-0 flex gap-2">
+                    <button class="btn btn-outline h-9" onclick="viewCase('${c._id || c.id}')">View</button>
+                    <button class="btn btn-danger h-9" onclick="askDelete('${c._id || c.id}')">Delete</button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        } catch (err) {
+          console.error('loadCases error', err);
+          listEl.innerHTML = '<p class="text-sm text-primary-600">Unable to load reports.</p>';
+        }
+      }
+
+      // VIEW case details
+      window.viewCase = async function(caseId) {
+        const modal = el('viewCaseModal');
+        const details = el('caseDetails');
+        openModal(modal);
+        details.innerHTML = '<p class="text-center text-primary-600">Loading case details...</p>';
+        try {
+          const res = await fetch(`/api/cases/${caseId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+          if (!res.ok) { details.innerHTML = '<p class="text-error-500">Unable to load details.</p>'; return; }
+          const c = await res.json();
+          const created = c.created_at ? new Date(c.created_at).toLocaleString() : (c.createdAt?new Date(c.createdAt).toLocaleString():'—');
+          const updated = c.updated_at ? new Date(c.updated_at).toLocaleString() : (c.updatedAt?new Date(c.updatedAt).toLocaleString():'—');
+          const statusColor = (c.status || '').toLowerCase() === 'resolved' ? 'bg-green-100 text-green-800' : 
+                             (c.status || '').toLowerCase() === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
+                             'bg-gray-100 text-gray-800';
+          const priorityColor = (c.priority || '').toLowerCase() === 'high' ? 'bg-red-100 text-red-800' : 
+                               (c.priority || '').toLowerCase() === 'medium' ? 'bg-orange-100 text-orange-800' : 
+                               'bg-blue-100 text-blue-800';
+          
+          details.innerHTML = `
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="md:col-span-2">
+                <label class="text-xs font-semibold text-primary-600 uppercase tracking-wide">Title</label>
+                <p class="text-base font-semibold text-primary-900 mt-1">${c.title || '—'}</p>
+              </div>
+              
+              <div>
+                <label class="text-xs font-semibold text-primary-600 uppercase tracking-wide">Category</label>
+                <p class="text-base text-primary-800 mt-1">${(c.category || '—').charAt(0).toUpperCase() + (c.category || '').slice(1)}</p>
+              </div>
+              
+              <div>
+                <label class="text-xs font-semibold text-primary-600 uppercase tracking-wide">Location</label>
+                <p class="text-base text-primary-800 mt-1">${c.location || '—'}</p>
+              </div>
+              
+              <div>
+                <label class="text-xs font-semibold text-primary-600 uppercase tracking-wide">Status</label>
+                <div class="mt-1">
+                  <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${statusColor}">${c.status || '—'}</span>
+                </div>
+              </div>
+              
+              <div>
+                <label class="text-xs font-semibold text-primary-600 uppercase tracking-wide">Priority</label>
+                <div class="mt-1">
+                  <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${priorityColor}">${c.priority || 'Normal'}</span>
+                </div>
+              </div>
+              
+              <div class="md:col-span-2">
+                <label class="text-xs font-semibold text-primary-600 uppercase tracking-wide">Description</label>
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 mt-2 text-sm text-primary-700 leading-relaxed">${c.description || 'No description provided.'}</div>
+              </div>
+              
+              <div>
+                <label class="text-xs font-semibold text-primary-600 uppercase tracking-wide">Citizen Name</label>
+                <p class="text-base text-primary-800 mt-1">${c.citizen_name || '—'}</p>
+              </div>
+              
+              <div>
+                <label class="text-xs font-semibold text-primary-600 uppercase tracking-wide">Email</label>
+                <p class="text-base text-primary-800 mt-1">${c.citizen_email || '—'}</p>
+              </div>
+              
+              <div>
+                <label class="text-xs font-semibold text-primary-600 uppercase tracking-wide">Reported On</label>
+                <p class="text-base text-primary-800 mt-1">${created}</p>
+              </div>
+              
+              <div>
+                <label class="text-xs font-semibold text-primary-600 uppercase tracking-wide">Last Updated</label>
+                <p class="text-base text-primary-800 mt-1">${updated}</p>
+              </div>
+            </div>
+          `;
+          // store selected case id for edit/delete flows
+          modal.dataset.currentCaseId = c._id || c.id;
+        } catch (err) {
+          console.error('viewCase error', err);
+          details.innerHTML = '<p class="text-error-500">Error loading details.</p>';
+        }
+      };
+
+      // ask delete
+      let pendingDeleteId = null;
+      window.askDelete = function(caseId) {
+        pendingDeleteId = caseId;
+        el('deleteResult').textContent = '';
+        openModal(el('deleteModal'));
+      };
+
+      el('confirmDelete').addEventListener('click', async () => {
+        if (!pendingDeleteId) return;
+        el('deleteResult').textContent = 'Deleting...';
+        try {
+          const res = await fetch(`/api/cases/${pendingDeleteId}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+          const data = await safeJson(res) || {};
+          if (!res.ok) { el('deleteResult').textContent = data.error || 'Delete failed.'; el('deleteResult').className='text-sm text-error-500'; return; }
+          el('deleteResult').textContent = 'Deleted successfully.'; el('deleteResult').className='text-sm text-success-500';
+          setTimeout(()=> { closeModal(el('deleteModal')); pendingDeleteId=null; loadCitizen(); }, 700);
+        } catch (err) {
+          console.error('delete error', err);
+          el('deleteResult').textContent = 'Network error.'; el('deleteResult').className='text-sm text-error-500';
+        }
+      });
+
+      // open edit modal from view
+      el('editCaseBtn').addEventListener('click', async () => {
+        const viewM = el('viewCaseModal');
+        const caseId = viewM.dataset.currentCaseId;
+        if (!caseId) return;
+        // load case, prefill edit form
+        try {
+          const res = await fetch(`/api/cases/${caseId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+          if (!res.ok) { alert('Failed to load case for edit'); return; }
+          const c = await res.json();
+          el('editCaseId').value = c._id || c.id;
+          el('editTitle').value = c.title || '';
+          el('editCategory').value = c.category || 'other';
+          el('editLocation').value = c.location || '';
+          el('editDescription').value = c.description || '';
+          el('editStatus').value = c.status || 'Pending';
+          el('editResult').textContent = '';
+          closeModal(el('viewCaseModal'));
+          openModal(el('editModal'));
+        } catch (err) {
+          console.error('open edit error', err);
+          alert('Error loading case for editing.');
+        }
+      });
+
+      // save edit
+      el('saveEdit').addEventListener('click', async () => {
+        const id = el('editCaseId').value;
+        const title = el('editTitle').value.trim();
+        const category = el('editCategory').value;
+        const location = el('editLocation').value.trim();
+        const description = el('editDescription').value.trim();
+        const status = el('editStatus').value;
+        const resEl = el('editResult');
+
+        if (!title || !location || !description) { resEl.textContent = 'Please fill title, location and description.'; resEl.className='text-sm text-error-500'; return; }
+
+        resEl.textContent = 'Saving...'; resEl.className='text-sm text-primary-600';
+
+        try {
+          const res = await fetch(`/api/cases/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ title, category, location, description, status })
+          });
+          const data = await safeJson(res) || {};
+          if (!res.ok) { resEl.textContent = data.error || 'Update failed'; resEl.className='text-sm text-error-500'; return; }
+          resEl.textContent = 'Updated successfully.'; resEl.className='text-sm text-success-500';
+          setTimeout(()=> { closeModal(el('editModal')); loadCitizen(); }, 700);
+        } catch (err) {
+          console.error('update error', err);
+          resEl.textContent = 'Network error while updating.'; resEl.className='text-sm text-error-500';
+        }
+      });
+
+      // Submit new report
+      async function submitReport(notify=false) {
+        const title = el('reportTitle').value.trim();
+        const category = el('reportCategory').value;
+        const location = el('reportLocation').value.trim();
+        const description = el('reportDescription').value.trim();
+        const resultEl = el('reportResult');
+        if (!title || !location || !description) { resultEl.textContent = 'Please fill Title, Location and Description.'; resultEl.className='text-sm text-error-500'; return; }
+        resultEl.textContent = 'Submitting...'; resultEl.className='text-sm text-primary-600';
+        const payload = { title, category, location, description, notify: !!notify };
+        try {
+          const res = await fetch('/api/cases', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(payload) });
+          const data = await safeJson(res) || {};
+          if (!res.ok) { resultEl.textContent = data.error || 'Failed to submit report'; resultEl.className='text-sm text-error-500'; return; }
+          resultEl.textContent = 'Report submitted successfully.'; resultEl.className='text-sm text-success-500';
+          setTimeout(()=> { el('reportForm').reset(); resultEl.textContent=''; closeModal(el('reportModal')); loadCitizen(); }, 900);
+        } catch (err) {
+          console.error('submitReport error', err);
+          resultEl.textContent = 'Network error while submitting.'; resultEl.className='text-sm text-error-500';
+        }
+      }
+      el('submitReport').addEventListener('click', ()=> submitReport(false));
+      el('submitReportPrimary').addEventListener('click', ()=> submitReport(true));
+
+      // helpful small UX: help button to show tips
+      el('reportHelpBtn').addEventListener('click', ()=> {
+        alert('Tips: Provide clear title, exact location (landmark/street), and a concise description. Use "Submit & Notify" to notify assigned officer immediately (if backend supports notify).');
+      });
+
+      // Download Reports function
+      window.downloadReports = async function(format) {
+        const statusEl = el('downloadStatus');
+        const fromDate = el('exportFromDate').value;
+        const toDate = el('exportToDate').value;
+        const statusFilter = el('exportStatus').value;
+        const categoryFilter = el('exportCategory').value;
+
+        statusEl.textContent = 'Preparing download...';
+        statusEl.className = 'text-sm text-blue-600';
+
+        try {
+          // Get user info
+          const userRes = await fetch('/api/me', { headers: { 'Authorization': `Bearer ${token}` } });
+          if (!userRes.ok) throw new Error('Failed to get user info');
+          const userData = await userRes.json();
+          const u = userData.user || {};
+          const citizenId = u._id || u.id;
+
+          if (!citizenId) {
+            statusEl.textContent = 'Unable to identify user. Please log in again.';
+            statusEl.className = 'text-sm text-red-600';
+            return;
+          }
+
+          // Get cases
+          const casesRes = await fetch(`/api/cases/citizen/${citizenId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+          if (!casesRes.ok) throw new Error('Failed to fetch cases');
+          const casesData = await casesRes.json();
+          let cases = casesData.cases || [];
+
+          // Apply filters
+          if (fromDate) {
+            cases = cases.filter(c => {
+              const caseDate = c.created_at ? new Date(c.created_at) : new Date(c.createdAt || 0);
+              return caseDate >= new Date(fromDate);
+            });
+          }
+          if (toDate) {
+            cases = cases.filter(c => {
+              const caseDate = c.created_at ? new Date(c.created_at) : new Date(c.createdAt || 0);
+              const to = new Date(toDate);
+              to.setHours(23, 59, 59, 999);
+              return caseDate <= to;
+            });
+          }
+          if (statusFilter !== 'all') {
+            cases = cases.filter(c => (c.status || '').toLowerCase() === statusFilter.toLowerCase());
+          }
+          if (categoryFilter !== 'all') {
+            cases = cases.filter(c => (c.category || '').toLowerCase() === categoryFilter.toLowerCase());
+          }
+
+          if (cases.length === 0) {
+            statusEl.textContent = 'No reports found matching the selected filters.';
+            statusEl.className = 'text-sm text-yellow-600';
+            return;
+          }
+
+          // Generate file based on format
+          if (format === 'csv') {
+            // Generate CSV
+            const headers = ['Case ID', 'Title', 'Category', 'Status', 'Location', 'Description', 'Created Date', 'Updated Date'];
+            const rows = cases.map(c => [
+              c._id || c.id || '',
+              `"${(c.title || '').replace(/"/g, '""')}"`,
+              c.category || '',
+              c.status || '',
+              `"${(c.location || '').replace(/"/g, '""')}"`,
+              `"${(c.description || '').replace(/"/g, '""')}"`,
+              c.created_at ? new Date(c.created_at).toLocaleString() : (c.createdAt ? new Date(c.createdAt).toLocaleString() : ''),
+              c.updated_at ? new Date(c.updated_at).toLocaleString() : (c.createdAt ? new Date(c.createdAt).toLocaleString() : '')
+            ]);
+            const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `crime-reports-${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+            statusEl.textContent = `✓ Successfully downloaded ${cases.length} report(s) as CSV.`;
+            statusEl.className = 'text-sm text-green-600';
+          } else if (format === 'pdf' || format === 'excel') {
+            // For PDF/Excel, create a formatted text file (in production, use a proper library)
+            const reportText = `CRIMEGUARD PRO - CASE REPORTS\nGenerated: ${new Date().toLocaleString()}\n\n`;
+            const reportContent = cases.map((c, idx) => {
+              return `Report ${idx + 1}:\n` +
+                     `Case ID: ${c._id || c.id || 'N/A'}\n` +
+                     `Title: ${c.title || 'N/A'}\n` +
+                     `Category: ${c.category || 'N/A'}\n` +
+                     `Status: ${c.status || 'N/A'}\n` +
+                     `Location: ${c.location || 'N/A'}\n` +
+                     `Description: ${c.description || 'N/A'}\n` +
+                     `Created: ${c.created_at ? new Date(c.created_at).toLocaleString() : (c.createdAt ? new Date(c.createdAt).toLocaleString() : 'N/A')}\n` +
+                     `Updated: ${c.updated_at ? new Date(c.updated_at).toLocaleString() : (c.createdAt ? new Date(c.createdAt).toLocaleString() : 'N/A')}\n` +
+                     `\n${'='.repeat(50)}\n\n`;
+            }).join('');
+            
+            const fullContent = reportText + reportContent;
+            const blob = new Blob([fullContent], { type: format === 'pdf' ? 'text/plain' : 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `crime-reports-${new Date().toISOString().split('T')[0]}.${format === 'pdf' ? 'txt' : 'txt'}`;
+            link.click();
+            statusEl.textContent = `✓ Successfully downloaded ${cases.length} report(s). Note: For proper ${format.toUpperCase()} format, please use the backend export API.`;
+            statusEl.className = 'text-sm text-green-600';
+          }
+        } catch (err) {
+          console.error('downloadReports error', err);
+          statusEl.textContent = 'Error generating download. Please try again.';
+          statusEl.className = 'text-sm text-red-600';
+        }
+      };
+
+      // Load all reports for popup modal
+      async function loadAllReportsForPopup() {
+        const listEl = el('myReportsList');
+        try {
+          const res = await fetch('/api/me', { headers: { 'Authorization': `Bearer ${token}` } });
+          if (!res.ok) { listEl.innerHTML = '<p class="text-sm text-primary-600 text-center py-4">Unable to load reports.</p>'; return; }
+          const data = await res.json();
+          const u = data.user || {};
+          const citizenId = u._id || u.id;
+          if (!citizenId) { listEl.innerHTML = '<p class="text-sm text-primary-600 text-center py-4">No reports yet.</p>'; return; }
+          
+          const casesRes = await fetch(`/api/cases/citizen/${citizenId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+          if (!casesRes.ok) { listEl.innerHTML = '<p class="text-sm text-primary-600 text-center py-4">Unable to load reports.</p>'; return; }
+          const casesData = await casesRes.json();
+          const cases = casesData.cases || [];
+          
+          if (!cases.length) { 
+            listEl.innerHTML = '<p class="text-sm text-primary-600 text-center py-4">No reports yet.</p>'; 
+            return; 
+          }
+          
+          listEl.innerHTML = cases.map(c => {
+            const priorityClass = (c.priority || '').toLowerCase() === 'high' ? 'bg-red-500 text-white' : 
+                                 (c.priority || '').toLowerCase() === 'medium' ? 'bg-orange-500 text-white' : 
+                                 'bg-gray-200 text-gray-700';
+            const statusLower = (c.status || '').toLowerCase();
+            const statusClass = statusLower === 'resolved' ? 'bg-green-500 text-white' : 
+                              statusLower === 'pending' ? 'bg-yellow-400 text-black' : 
+                              statusLower === 'in progress' || statusLower === 'ongoing' ? 'bg-blue-500 text-white' :
+                              'bg-gray-300 text-gray-800';
+            const created = c.created_at ? new Date(c.created_at).toLocaleString() : (c.createdAt? new Date(c.createdAt).toLocaleString() : '—');
+            const updated = c.updated_at ? new Date(c.updated_at).toLocaleString() : (c.createdAt? new Date(c.createdAt).toLocaleString() : '—');
+            return `
+              <div class="border border-gray-200 rounded-lg p-5 hover:shadow-md transition">
+                <div class="flex justify-between items-start gap-4">
+                  <div class="flex-1">
+                    <div class="flex items-center mb-2 space-x-2 flex-wrap">
+                      <span class="chip ${priorityClass}">${c.priority || 'Normal'}</span>
+                      <span class="chip ${statusClass}">${c.status || 'Open'}</span>
+                      <span class="text-xs text-primary-500">${c.category || 'Other'}</span>
+                    </div>
+                    <h4 class="font-semibold text-primary-900 text-lg mb-1">${c.title || 'Untitled Report'}</h4>
+                    <p class="text-sm text-primary-600 mb-2 line-clamp-2">${c.description || 'No description'}</p>
+                    <div class="flex flex-wrap gap-4 text-xs text-primary-500 mt-2">
+                      <span>📍 ${c.location || '—'}</span>
+                      <span>📅 Filed: ${created}</span>
+                      ${updated !== created ? `<span>🔄 Updated: ${updated}</span>` : ''}
+                    </div>
+                  </div>
+                  <div class="flex-shrink-0 flex gap-2">
+                    <button class="btn btn-outline h-9" onclick="closeModal(el('myReportsModal')); viewCase('${c._id || c.id}')">View</button>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('');
+        } catch (err) {
+          console.error('loadAllReportsForPopup error', err);
+          listEl.innerHTML = '<p class="text-sm text-primary-600 text-center py-4">Unable to load reports.</p>';
+        }
+      }
+
+      // initialize
+      loadCitizen();
+
+      // Expose close/open to console if needed
+      window.openModal = openModal;
+      window.closeModal = closeModal;
+
+    })();
+  </script>
+</body>
+</html>

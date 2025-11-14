@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Edit Profile | CrimeGuard Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { 50: '#f8fafc', 100: '#f1f5f9', 800: '#1e293b', 900: '#0f172a' },
+            accent: { 500: '#e67e22', 600: '#c2410c' },
+            success: { 50: '#f0fdf4', 500: '#22c55e' },
+            error: { 50: '#fef2f2', 500: '#ef4444' },
+            warning: { 50: '#fffbeb', 500: '#f59e0b' }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    .card { @apply bg-white border border-gray-200 rounded-lg shadow-sm; }
+    .btn { @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold transition; }
+    .btn-primary { @apply bg-primary-800 text-white hover:bg-primary-700; }
+    .btn-outline { @apply border border-primary-800 text-primary-800 hover:bg-primary-50; }
+  </style>
+</head>
+
+<body class="bg-gray-50 text-primary-900">
+  <!-- NAVBAR -->
+  <header class="bg-white shadow-sm sticky top-0 z-40">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-4">
+        <img src="/static/images/newlogo.png" style="height: 210px; width: auto;">
+      </div>
+
+      <div class="flex items-center space-x-5">
+        <a href="/dashboard/officer" class="text-sm text-primary-600 hover:text-primary-800">Dashboard</a>
+        <a href="/home" class="text-sm text-primary-600 hover:text-primary-800">Home</a>
+        <a href="/logout" class="text-sm text-error-500 hover:text-error-700">Sign Out</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- MAIN -->
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="card p-6">
+      <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
+        <h1 class="text-2xl font-bold text-primary-800 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-accent-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+          Edit Profile
+        </h1>
+        <a href="/dashboard/officer" class="text-sm text-primary-600 hover:text-primary-800">← Back to Dashboard</a>
+      </div>
+
+      <form id="profileForm" class="space-y-6">
+        <div id="profileResult" class="text-sm font-medium"></div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-semibold text-primary-700 mb-2">First Name <span class="text-red-500">*</span></label>
+            <input id="firstName" type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition outline-none" required>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-primary-700 mb-2">Last Name <span class="text-red-500">*</span></label>
+            <input id="lastName" type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition outline-none" required>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-primary-700 mb-2">Email <span class="text-red-500">*</span></label>
+            <input id="email" type="email" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition outline-none" required>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-primary-700 mb-2">Phone <span class="text-red-500">*</span></label>
+            <input id="phone" type="tel" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition outline-none" required>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-primary-700 mb-2">Badge Number</label>
+            <input id="badge" type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-primary-700 mb-2">Department</label>
+            <input id="department" type="text" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition outline-none">
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-primary-700 mb-2">Address</label>
+            <textarea id="address" rows="3" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition outline-none resize-none"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-primary-700 mb-2">Date of Birth</label>
+            <input id="dob" type="date" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition outline-none">
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-primary-700 mb-2">Gender</label>
+            <select id="gender" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition outline-none bg-white">
+              <option value="">Select Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+              <option value="prefer_not_to_say">Prefer not to say</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="border-t border-gray-200 pt-6">
+          <h3 class="text-lg font-semibold text-primary-800 mb-4">Change Password (Optional)</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-semibold text-primary-700 mb-2">New Password</label>
+              <input id="newPassword" type="password" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition outline-none" placeholder="Leave blank to keep current password">
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-primary-700 mb-2">Confirm New Password</label>
+              <input id="confirmPassword" type="password" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition outline-none" placeholder="Confirm new password">
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+          <a href="/dashboard/officer" class="px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition">Cancel</a>
+          <button type="button" id="saveProfile" class="px-6 py-2.5 bg-accent-500 text-white rounded-lg font-semibold hover:bg-accent-600 transition shadow-md">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-primary-900 text-white py-8 mt-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <p class="text-primary-200">&copy; 2025 CrimeGuard Pro. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const el = id => document.getElementById(id);
+
+      // Accept multiple token keys
+      const tokenKeys = ['authToken', 'token', 'jwt', 'accessToken'];
+      function readToken() {
+        for (const k of tokenKeys) {
+          const v = localStorage.getItem(k);
+          if (v) return { token: v, key: k };
+        }
+        return { token: null, key: null };
+      }
+      const { token } = readToken();
+      if (!token) {
+        console.warn('No token found; redirecting to /login');
+        return window.location.href = '/login';
+      }
+
+      let currentOfficerId = null;
+
+      // Load current officer profile
+      async function loadProfile() {
+        try {
+          const res = await fetch('/api/officer/me', { headers: { 'Authorization': `Bearer ${token}` } });
+          if (!res.ok) { 
+            tokenKeys.forEach(k=>localStorage.removeItem(k)); 
+            return window.location.href='/login'; 
+          }
+          const data = await res.json();
+          currentOfficerId = data.id;
+
+          // Populate form
+          el('firstName').value = data.first_name || '';
+          el('lastName').value = data.last_name || '';
+          el('email').value = data.email || '';
+          el('phone').value = data.phone || '';
+          el('badge').value = data.badge || '';
+          el('department').value = data.department || '';
+          el('address').value = data.address || '';
+          el('dob').value = data.date_of_birth || '';
+          el('gender').value = data.gender || '';
+        } catch (err) {
+          console.error('loadProfile error', err);
+          tokenKeys.forEach(k=>localStorage.removeItem(k));
+          window.location.href = '/login';
+        }
+      }
+
+      // Save profile
+      el('saveProfile').addEventListener('click', async () => {
+        const resultEl = el('profileResult');
+        const firstName = el('firstName').value.trim();
+        const lastName = el('lastName').value.trim();
+        const email = el('email').value.trim();
+        const phone = el('phone').value.trim();
+        const badge = el('badge').value.trim();
+        const department = el('department').value.trim();
+        const address = el('address').value.trim();
+        const dob = el('dob').value;
+        const gender = el('gender').value;
+        const newPassword = el('newPassword').value;
+        const confirmPassword = el('confirmPassword').value;
+
+        if (!firstName || !lastName || !email || !phone) {
+          resultEl.textContent = 'Please fill all required fields.';
+          resultEl.className = 'text-sm text-error-500';
+          return;
+        }
+
+        if (newPassword && newPassword !== confirmPassword) {
+          resultEl.textContent = 'Passwords do not match.';
+          resultEl.className = 'text-sm text-error-500';
+          return;
+        }
+
+        resultEl.textContent = 'Saving...';
+        resultEl.className = 'text-sm text-primary-600';
+
+        const updateData = {
+          first_name: firstName,
+          last_name: lastName,
+          email: email,
+          phone: phone,
+        };
+
+        if (badge) updateData.badge = badge;
+        if (department) updateData.department = department;
+        if (address) updateData.address = address;
+        if (dob) updateData.date_of_birth = dob;
+        if (gender) updateData.gender = gender;
+
+        if (newPassword) {
+          updateData.password = newPassword;
+        }
+
+        try {
+          const res = await fetch(`/api/officer/me`, {
+            method: 'PUT',
+            headers: { 
+              'Content-Type': 'application/json', 
+              'Authorization': `Bearer ${token}` 
+            },
+            body: JSON.stringify(updateData)
+          });
+
+          const data = await res.json();
+          if (!res.ok) {
+            resultEl.textContent = data.error || 'Update failed';
+            resultEl.className = 'text-sm text-error-500';
+            return;
+          }
+
+          resultEl.textContent = 'Profile updated successfully!';
+          resultEl.className = 'text-sm text-success-500';
+          
+          // Clear password fields
+          el('newPassword').value = '';
+          el('confirmPassword').value = '';
+
+          // Redirect after 1 second
+          setTimeout(() => {
+            window.location.href = '/dashboard/officer';
+          }, 1000);
+        } catch (err) {
+          console.error('saveProfile error', err);
+          resultEl.textContent = 'Network error while updating.';
+          resultEl.className = 'text-sm text-error-500';
+        }
+      });
+
+      // Initialize
+      loadProfile();
+    })();
+  </script>
+</body>
+</html>
+

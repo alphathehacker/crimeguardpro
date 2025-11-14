@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>System Status - CrimeGuard Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="/home">
+                        <img src="/static/images/newlogo.png" style="height: 210px; width: auto;">
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/login" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm">Login</a>
+                    <a href="/home" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm">Home</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">System Status</h1>
+            <p class="text-gray-600">Real-time monitoring of CrimeGuard Pro services and infrastructure</p>
+        </div>
+
+        <!-- Overall Status -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-semibold text-gray-900">Overall System Status</h2>
+                <span class="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-semibold flex items-center">
+                    <span class="w-3 h-3 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+                    All Systems Operational
+                </span>
+            </div>
+            <p class="text-gray-600 mb-4">Last updated: <span id="lastUpdate"></span></p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium text-gray-700">Uptime</span>
+                        <span class="text-2xl font-bold text-green-600">99.9%</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Last 30 days</p>
+                </div>
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium text-gray-700">Response Time</span>
+                        <span class="text-2xl font-bold text-blue-600">< 200ms</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Average latency</p>
+                </div>
+                <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium text-gray-700">Active Users</span>
+                        <span class="text-2xl font-bold text-purple-600">1,234</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Currently online</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Service Status -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-6">Service Status</h2>
+            <div class="space-y-4">
+                <!-- Authentication Service -->
+                <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Authentication Service</h3>
+                            <p class="text-sm text-gray-600">Login, registration, and session management</p>
+                        </div>
+                    </div>
+                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">Operational</span>
+                </div>
+
+                <!-- Database Service -->
+                <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Database Service</h3>
+                            <p class="text-sm text-gray-600">MongoDB data storage and retrieval</p>
+                        </div>
+                    </div>
+                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">Operational</span>
+                </div>
+
+                <!-- API Gateway -->
+                <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">API Gateway</h3>
+                            <p class="text-sm text-gray-600">REST API endpoints and routing</p>
+                        </div>
+                    </div>
+                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">Operational</span>
+                </div>
+
+                <!-- File Storage -->
+                <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">File Storage</h3>
+                            <p class="text-sm text-gray-600">Evidence and document storage</p>
+                        </div>
+                    </div>
+                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">Operational</span>
+                </div>
+
+                <!-- Notification Service -->
+                <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Notification Service</h3>
+                            <p class="text-sm text-gray-600">Email and SMS notifications</p>
+                        </div>
+                    </div>
+                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">Operational</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Maintenance Schedule -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-6">Scheduled Maintenance</h2>
+            <div class="space-y-4">
+                <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="font-semibold text-gray-900">Monthly System Update</h3>
+                        <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">Scheduled</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">Routine maintenance and security updates</p>
+                    <p class="text-xs text-gray-500">Scheduled for: First Sunday of each month, 2:00 AM - 4:00 AM EST</p>
+                </div>
+                <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                    <p class="text-sm text-gray-600">No upcoming maintenance windows scheduled.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status History -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-6">Recent Incidents</h2>
+            <div class="space-y-4">
+                <div class="p-4 border border-gray-200 rounded-lg">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="font-semibold text-gray-900">All systems operational</h3>
+                        <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">Resolved</span>
+                    </div>
+                    <p class="text-sm text-gray-600">No incidents reported in the last 30 days.</p>
+                    <p class="text-xs text-gray-500 mt-2">Last incident: None</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Guidance Section -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">Understanding System Status</h2>
+            <div class="space-y-4 text-gray-700">
+                <div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Status Indicators</h3>
+                    <ul class="list-disc list-inside space-y-1 text-sm ml-4">
+                        <li><strong>Operational:</strong> Service is running normally with no issues</li>
+                        <li><strong>Degraded:</strong> Service is functioning but with reduced performance</li>
+                        <li><strong>Outage:</strong> Service is unavailable or experiencing critical issues</li>
+                        <li><strong>Maintenance:</strong> Service is temporarily unavailable for scheduled updates</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-900 mb-2">What to Do During an Outage</h3>
+                    <ul class="list-disc list-inside space-y-1 text-sm ml-4">
+                        <li>Check this page for real-time updates on service restoration</li>
+                        <li>Avoid repeatedly attempting to log in during an outage</li>
+                        <li>Contact support if you have urgent business needs</li>
+                        <li>Follow our status updates on social media for announcements</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-900 mb-2">Maintenance Windows</h3>
+                    <p class="text-sm">Scheduled maintenance is typically performed during off-peak hours to minimize disruption. You will receive advance notice via email for any planned maintenance that may affect your access.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Support -->
+        <div class="mt-8 text-center">
+            <p class="text-gray-600 mb-4">Experiencing issues not reflected here?</p>
+            <a href="/help_center" class="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition">
+                Contact Support
+            </a>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-gray-300">&copy; 2025 CrimeGuard Pro. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Update last update time
+        document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
+        
+        // Auto-refresh every 60 seconds
+        setInterval(() => {
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
+        }, 60000);
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Incident Map | CrimeGuard Pro</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    body { background-color: #f9fafb; font-family: 'Inter', sans-serif; }
+    #map { height: 90vh; border-radius: 12px; margin-top: 20px; }
+    .leaflet-popup-content { font-size: 0.9rem; }
+  </style>
+</head>
+<body class="p-6">
+
+  <header class="flex justify-between items-center mb-4">
+    <h1 class="text-2xl font-semibold text-gray-800">🗺️ Incident Map</h1>
+    <a href="/dashboard/officer" class="btn bg-gray-800 text-white px-4 py-2 rounded-md">⬅ Back to Dashboard</a>
+  </header>
+
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    // Safe localStorage access (handles tracking prevention)
+    function safeGetLocalStorage(key) {
+      try {
+        return localStorage.getItem(key);
+      } catch (e) {
+        // Tracking prevention or privacy settings may block localStorage
+        console.warn('localStorage access blocked, trying sessionStorage...');
+        try {
+          return sessionStorage.getItem(key);
+        } catch (e2) {
+          console.warn('Storage access blocked by browser privacy settings');
+          return null;
+        }
+      }
+    }
+    
+    // Geocode function using Nominatim (OpenStreetMap's free geocoding service)
+    async function geocodeLocation(location) {
+      if (!location || location.trim() === "") {
+        return null;
+      }
+      
+      // Skip geocoding for obviously invalid locations (random strings, too short, etc.)
+      const trimmed = location.trim();
+      if (trimmed.length < 3 || /^[^a-zA-Z]*$/.test(trimmed)) {
+        return null; // Skip geocoding for invalid locations
+      }
+      
+      try {
+        // Use Nominatim API for geocoding
+        const encodedLocation = encodeURIComponent(trimmed + ", India");
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodedLocation}&format=json&limit=1`,
+          {
+            headers: {
+              'User-Agent': 'CrimeGuardPro/1.0' // Required by Nominatim
+            }
+          }
+        );
+        
+        if (!response.ok) {
+          // Only log if it's a server error, not for invalid locations
+          if (response.status >= 500) {
+            console.warn(`Geocoding service error for "${location}": HTTP ${response.status}`);
+          }
+          return null;
+        }
+        
+        const data = await response.json();
+        
+        if (data && data.length > 0) {
+          return {
+            lat: parseFloat(data[0].lat),
+            lon: parseFloat(data[0].lon)
+          };
+        }
+        
+        return null;
+      } catch (error) {
+        // Only log network errors, not expected failures
+        if (error.name !== 'TypeError' && !error.message.includes('fetch')) {
+          console.error(`Error geocoding "${location}":`, error);
+        }
+        return null;
+      }
+    }
+    
+    // Extract city name from location string (simple heuristic)
+    function extractCityName(location) {
+      if (!location) return "";
+      
+      // Common patterns: "City, State", "City", "Address, City"
+      const parts = location.split(",").map(p => p.trim());
+      
+      // If location contains commas, try to extract city (usually second-to-last or last part)
+      if (parts.length > 1) {
+        // Return the part that looks like a city (not too long, not a number)
+        for (let i = parts.length - 1; i >= 0; i--) {
+          const part = parts[i];
+          if (part.length > 2 && part.length < 50 && !/^\d+$/.test(part)) {
+            return part;
+          }
+        }
+      }
+      
+      // If no commas, return the whole string
+      return location;
+    }
+
+    async function loadIncidentMap() {
+      // Use safe localStorage access
+      const token = safeGetLocalStorage("token") || safeGetLocalStorage("authToken") || "";
+      
+      if (!token) {
+        alert("Authentication required. Please log in again.");
+        window.location.href = "/login";
+        return;
+      }
+      
+      let data;
+      try {
+        const res = await fetch("/api/officer/incidents", {
+          headers: { Authorization: "Bearer " + token },
+        });
+        
+        if (!res.ok) {
+          if (res.status === 401) {
+            alert("Session expired. Please log in again.");
+            window.location.href = "/login";
+            return;
+          }
+          throw new Error(`HTTP ${res.status}`);
+        }
+        
+        data = await res.json();
+      } catch (error) {
+        console.error("Error fetching incidents:", error);
+        alert("Failed to load incidents. Please try again later.");
+        return;
+      }
+
+      const map = L.map("map").setView([20.5937, 78.9629], 5); // Center on India
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 18,
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+
+      if (!Array.isArray(data) || data.length === 0) {
+        alert("No incidents found.");
+        return;
+      }
+
+      // Show loading message with progress
+      const loadingDiv = document.createElement("div");
+      loadingDiv.style.cssText = "position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:20px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:1000;min-width:300px;text-align:center;";
+      const progressText = document.createElement("div");
+      progressText.style.cssText = "margin-top:10px;font-size:0.9rem;color:#666;";
+      loadingDiv.innerHTML = "<div style='font-weight:600;margin-bottom:8px'>Loading incidents...</div>";
+      loadingDiv.appendChild(progressText);
+      document.body.appendChild(loadingDiv);
+
+      let geocodedCount = 0;
+      let failedCount = 0;
+      let skippedCount = 0;
+      const markers = [];
+      const total = data.length;
+
+      // Process each incident with geocoding
+      for (let i = 0; i < data.length; i++) {
+        const item = data[i];
+        const location = item.location || "";
+        
+        // Update progress
+        progressText.textContent = `Processing ${i + 1} of ${total} incidents...`;
+        
+        // Skip empty locations
+        if (!location || location.trim() === "") {
+          skippedCount++;
+          continue;
+        }
+        
+        const cityName = extractCityName(location);
+        
+        // Try to geocode the location
+        const coords = await geocodeLocation(cityName || location);
+        
+        if (coords) {
+          const marker = L.marker([coords.lat, coords.lon]).addTo(map);
+          marker.bindPopup(`
+            <b>${item.title || "Untitled"}</b><br>
+            <b>Category:</b> ${item.category || "Unknown"}<br>
+            <b>Status:</b> ${item.status || "Pending"}<br>
+            <b>Complainant:</b> ${item.complainant || "—"}<br>
+            <b>Location:</b> ${location || "Unknown"}<br>
+            <b>Created:</b> ${item.created_at ? new Date(item.created_at).toLocaleString() : "—"}
+          `);
+          markers.push(marker);
+          geocodedCount++;
+        } else {
+          // Only use fallback for locations that look valid but couldn't be geocoded
+          // Skip obviously invalid locations (random strings, etc.)
+          const isLikelyValid = location.length >= 3 && /[a-zA-Z]/.test(location);
+          
+          if (isLikelyValid) {
+            // Fallback: use approximate coordinates for India if geocoding fails
+            const fallbackLat = 20.5937 + (Math.random() - 0.5) * 10;
+            const fallbackLon = 78.9629 + (Math.random() - 0.5) * 10;
+            const marker = L.marker([fallbackLat, fallbackLon]).addTo(map);
+            marker.bindPopup(`
+              <b>${item.title || "Untitled"}</b><br>
+              <b>Category:</b> ${item.category || "Unknown"}<br>
+              <b>Status:</b> ${item.status || "Pending"}<br>
+              <b>Complainant:</b> ${item.complainant || "—"}<br>
+              <b>Location:</b> ${location || "Unknown"}<br>
+              <b>Created:</b> ${item.created_at ? new Date(item.created_at).toLocaleString() : "—"}<br>
+              <small style="color:#e74c3c">⚠️ Approximate location (geocoding unavailable)</small>
+            `);
+            markers.push(marker);
+            failedCount++;
+          } else {
+            skippedCount++;
+          }
+        }
+        
+        // Add small delay to respect Nominatim rate limits (1 request per second)
+        // Only delay if we actually tried to geocode
+        if (location && location.trim() !== "") {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+
+      // Remove loading message
+      if (loadingDiv.parentNode) {
+        loadingDiv.parentNode.removeChild(loadingDiv);
+      }
+
+      // Fit map to show all markers
+      if (markers.length > 0) {
+        const group = new L.featureGroup(markers);
+        map.fitBounds(group.getBounds().pad(0.1));
+      } else {
+        // If no markers, show a message
+        alert("No valid locations found to display on the map.");
+      }
+
+      // Show summary in console (less verbose)
+      if (geocodedCount > 0 || failedCount > 0) {
+        console.log(`Map loaded: ${geocodedCount} geocoded, ${failedCount} approximate, ${skippedCount} skipped`);
+      }
+    }
+
+    loadIncidentMap();
+  </script>
+</body>
+</html>

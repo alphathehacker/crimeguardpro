@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Account Assistance - CrimeGuard Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="/home">
+                        <img src="/static/images/newlogo.png" style="height: 210px; width: auto;">
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/login" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm">Login</a>
+                    <a href="/home" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm">Home</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">Account Assistance</h1>
+            <p class="text-gray-600">Get help with account issues, registration, and access problems</p>
+        </div>
+
+        <!-- Common Issues -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-6">Common Account Issues</h2>
+            <div class="space-y-4">
+                <!-- Issue 1 -->
+                <div class="border border-gray-200 rounded-lg p-5">
+                    <h3 class="font-semibold text-gray-900 mb-2 flex items-center">
+                        <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Cannot Log In
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-3">If you're having trouble logging in, try these steps:</p>
+                    <ol class="list-decimal list-inside space-y-2 text-sm text-gray-700 ml-4">
+                        <li>Verify you're using the correct email address associated with your account</li>
+                        <li>Check if Caps Lock is enabled (passwords are case-sensitive)</li>
+                        <li>Clear your browser cache and cookies</li>
+                        <li>Try using a different browser or incognito/private mode</li>
+                        <li>If you've forgotten your password, use the <a href="/password-recovery" class="text-blue-600 hover:underline">Password Recovery</a> tool</li>
+                    </ol>
+                </div>
+
+                <!-- Issue 2 -->
+                <div class="border border-gray-200 rounded-lg p-5">
+                    <h3 class="font-semibold text-gray-900 mb-2 flex items-center">
+                        <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                        </svg>
+                        Account Registration Problems
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-3">Having trouble creating a new account?</p>
+                    <ol class="list-decimal list-inside space-y-2 text-sm text-gray-700 ml-4">
+                        <li>Ensure all required fields are filled correctly</li>
+                        <li>Check that your email address is valid and not already registered</li>
+                        <li>Verify your phone number format matches the required pattern</li>
+                        <li>Make sure your password meets the security requirements (min 8 characters, includes letters and numbers)</li>
+                        <li>Check your email spam folder for the verification email</li>
+                        <li>Wait a few minutes and try again if you receive a "too many requests" error</li>
+                    </ol>
+                </div>
+
+                <!-- Issue 3 -->
+                <div class="border border-gray-200 rounded-lg p-5">
+                    <h3 class="font-semibold text-gray-900 mb-2 flex items-center">
+                        <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                        Account Locked or Suspended
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-3">Your account may be locked for security reasons:</p>
+                    <ul class="list-disc list-inside space-y-2 text-sm text-gray-700 ml-4">
+                        <li><strong>Multiple failed login attempts:</strong> Account is temporarily locked for 30 minutes</li>
+                        <li><strong>Suspicious activity detected:</strong> Contact support immediately</li>
+                        <li><strong>Policy violation:</strong> Review our terms of service and contact support</li>
+                        <li><strong>Unpaid fees (if applicable):</strong> Resolve payment issues to restore access</li>
+                    </ul>
+                    <p class="text-sm text-gray-600 mt-3">To unlock your account, contact our support team with your account email address.</p>
+                </div>
+
+                <!-- Issue 4 -->
+                <div class="border border-gray-200 rounded-lg p-5">
+                    <h3 class="font-semibold text-gray-900 mb-2 flex items-center">
+                        <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        Email Verification Issues
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-3">Not receiving verification emails?</p>
+                    <ol class="list-decimal list-inside space-y-2 text-sm text-gray-700 ml-4">
+                        <li>Check your spam or junk mail folder</li>
+                        <li>Verify the email address you used during registration</li>
+                        <li>Add noreply@crimeguardpro.gov to your email whitelist</li>
+                        <li>Wait up to 10 minutes for the email to arrive</li>
+                        <li>Request a new verification email from your account settings</li>
+                        <li>Contact support if emails still don't arrive after 24 hours</li>
+                    </ol>
+                </div>
+
+                <!-- Issue 5 -->
+                <div class="border border-gray-200 rounded-lg p-5">
+                    <h3 class="font-semibold text-gray-900 mb-2 flex items-center">
+                        <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        Changing Account Information
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-3">Need to update your account details?</p>
+                    <ul class="list-disc list-inside space-y-2 text-sm text-gray-700 ml-4">
+                        <li><strong>Email address:</strong> Update from your profile settings (requires verification)</li>
+                        <li><strong>Phone number:</strong> Change in account settings, verify with SMS code</li>
+                        <li><strong>Password:</strong> Use the <a href="/password-recovery" class="text-blue-600 hover:underline">Password Recovery</a> page or change from profile settings</li>
+                        <li><strong>Personal information:</strong> Edit from your dashboard profile section</li>
+                    </ul>
+                    <p class="text-sm text-gray-600 mt-3"><strong>Note:</strong> Some changes may require additional verification for security purposes.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Role-Specific Guidance -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-6">Role-Specific Assistance</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Citizen -->
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <h3 class="font-semibold text-gray-900 mb-2">Citizen Accounts</h3>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>• Report crimes and incidents</li>
+                        <li>• Track case status</li>
+                        <li>• Update personal information</li>
+                        <li>• View case history</li>
+                    </ul>
+                    <a href="/login" class="text-blue-600 hover:underline text-sm mt-2 inline-block">Access Citizen Portal →</a>
+                </div>
+
+                <!-- Officer -->
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <h3 class="font-semibold text-gray-900 mb-2">Officer Accounts</h3>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>• Manage FIRs and cases</li>
+                        <li>• Access case assignments</li>
+                        <li>• Upload evidence</li>
+                        <li>• Team collaboration</li>
+                    </ul>
+                    <a href="/login" class="text-blue-600 hover:underline text-sm mt-2 inline-block">Access Officer Dashboard →</a>
+                </div>
+
+                <!-- Admin -->
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <h3 class="font-semibold text-gray-900 mb-2">Admin Accounts</h3>
+                    <ul class="text-sm text-gray-600 space-y-1">
+                        <li>• System administration</li>
+                        <li>• User management</li>
+                        <li>• System monitoring</li>
+                        <li>• Reports and analytics</li>
+                    </ul>
+                    <a href="/login" class="text-blue-600 hover:underline text-sm mt-2 inline-block">Access Admin Center →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Best Practices -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">Account Security Best Practices</h2>
+            <div class="space-y-3 text-gray-700">
+                <div class="flex items-start">
+                    <svg class="w-5 h-5 text-blue-600 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                    <div>
+                        <strong>Use a strong password:</strong> Minimum 8 characters with a mix of letters, numbers, and special characters
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <svg class="w-5 h-5 text-blue-600 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                    <div>
+                        <strong>Enable two-factor authentication (2FA):</strong> Add an extra layer of security to your account
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <svg class="w-5 h-5 text-blue-600 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                    <div>
+                        <strong>Never share your credentials:</strong> CrimeGuard Pro staff will never ask for your password
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <svg class="w-5 h-5 text-blue-600 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                    <div>
+                        <strong>Log out from shared devices:</strong> Always log out when using public or shared computers
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <svg class="w-5 h-5 text-blue-600 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                    <div>
+                        <strong>Review account activity regularly:</strong> Check your login history for any suspicious activity
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Support -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4">Still Need Help?</h2>
+            <p class="text-gray-600 mb-6">If you've tried the solutions above and still need assistance, our support team is here to help.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <h3 class="font-semibold text-gray-900 mb-2">Email Support</h3>
+                    <p class="text-sm text-gray-600 mb-2">Send us an email and we'll respond within 24 hours.</p>
+                    <a href="mailto:support@crimeguardpro.gov" class="text-blue-600 hover:underline text-sm">support@crimeguardpro.gov</a>
+                </div>
+                <div class="border border-gray-200 rounded-lg p-4">
+                    <h3 class="font-semibold text-gray-900 mb-2">Help Center</h3>
+                    <p class="text-sm text-gray-600 mb-2">Browse our comprehensive help documentation.</p>
+                    <a href="/help_center" class="text-blue-600 hover:underline text-sm">Visit Help Center →</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="text-center space-x-4">
+            <a href="/password-recovery" class="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition">
+                Password Recovery
+            </a>
+            <a href="/system-status" class="inline-block px-6 py-3 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition">
+                System Status
+            </a>
+            <a href="/login" class="inline-block px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition">
+                Back to Login
+            </a>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-gray-300">&copy; 2025 CrimeGuard Pro. All Rights Reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
+

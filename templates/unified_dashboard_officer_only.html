@@ -1,0 +1,2541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Unified Dashboard - CrimeGuard Pro</title>
+  <meta name="description" content="CrimeGuard Pro Unified Dashboard - Personalized command center for officers and administrators." />
+
+  <!-- Minimal Tailwind-like utilities (subset) to ensure consistent look even without CDN -->
+  <style>
+    
+    /* -- Basic resets and fonts -- */
+    :root{
+      --primary: #2c3e50;
+      --accent: #e67e22;
+      --success: #22c55e;
+      --warning: #f39c12;
+      --error: #e74c3c;
+      --bg: #ffffff;
+      --surface: #f8f9fa;
+      --muted: #7f8c8d;
+      --border: #e5e7eb;
+      --card-shadow: 0 2px 8px rgba(44,62,80,0.08);
+      --modal-shadow: 0 10px 30px rgba(12,18,24,0.12);
+      --max-w: 1100px;
+      font-family: "Inter", "Source Sans Pro", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    html,body{height:100%;margin:0;background:var(--surface);color:var(--primary);-webkit-font-smoothing:antialiased}
+    a{color:inherit;text-decoration:none}
+    .container{max-width:var(--max-w);margin:0 auto;padding:18px}
+    .flex{display:flex}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-4{gap:1rem}.gap-2{gap:.5rem}
+    .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.6rem .9rem;border-radius:.5rem;border:1px solid var(--border);cursor:pointer;background:var(--bg)}
+    .btn-primary{background:var(--primary);color:#fff;border:none}
+    .btn-accent{background:var(--accent);color:#fff;border:none}
+    .btn-secondary{background:#394b57;color:#fff;border:none}
+    .card{background:var(--bg);border-radius:.6rem;padding:16px;border:1px solid var(--border);box-shadow:var(--card-shadow)}
+    header{background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:60}
+    .logo{height:44px}
+    h1,h2,h3{margin:0}
+    .muted{color:var(--muted)}
+    .small{font-size:.9rem}
+    .xs{font-size:.8rem}
+    .badge{display:inline-block;padding:.18rem .5rem;border-radius:999px;font-size:.8rem}
+    .badge-high{background:var(--error);color:#fff}
+    .badge-med{background:var(--warning);color:#fff}
+    .badge-normal{background:var(--primary);color:#fff}
+    /* Modal styles */
+    .modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,0.45);z-index:80;padding:20px}
+    .modal-backdrop.open{display:flex}
+    .modal{width:100%;max-width:920px;background:var(--bg);border-radius:.6rem;padding:20px;box-shadow:var(--modal-shadow);max-height:90vh;overflow:auto}
+    .modal .modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .input{width:100%;padding:.6rem .75rem;border:1px solid var(--border);border-radius:.45rem;background:#fff}
+    .grid{display:grid;gap:12px}
+    .grid-2{grid-template-columns:1fr 1fr}
+    .text-muted{color:var(--muted)}
+    .table{width:100%;border-collapse:collapse}
+    .table th,.table td{padding:.6rem;border-bottom:1px solid var(--border);text-align:left}
+    .actions{display:flex;gap:.5rem}
+    .danger{background:transparent;color:var(--error);border:1px solid rgba(231,76,60,0.12);padding:.45rem .7rem;border-radius:.45rem;cursor:pointer}
+    .small-muted{font-size:.85rem;color:var(--muted)}
+    .search{display:flex;gap:8px;align-items:center}
+     @media (max-width:880px){.grid-2{grid-template-columns:1fr}.container{padding:12px}}
+
+/* User Dropdown Styles */
+#userDropdown {
+  position: absolute;
+  right: 24px;
+  top: 72px;
+  z-index: 9999;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+}
+
+#userDropdown .dropdown-card {
+  width: 280px;
+  background: var(--bg);
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+#userDropdown .dropdown-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  color: #374151;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+#userDropdown .dropdown-item:hover {
+  background: #f9fafb;
+}
+
+/* Ensures parent container doesn't clip it */
+header {
+  position: relative;
+  overflow: visible !important;
+}
+
+
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <header>
+    <div class="container flex items-center justify-between" style="height:72px">
+      <div class="flex items-center gap-4">
+        <img src="/static/images/newlogo1.png" alt="CrimeGuard Pro Logo" style="height:90px;width:auto;margin-right:12px">
+        <div>
+          <div style="font-weight:700;font-size:1.05rem">Officer Dashboard</div>
+          <div class="xs muted">Unified Dashboard</div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <div class="search card" style="padding:6px 10px;border-radius:999px">
+          <input id="globalSearch" placeholder="Search cases, FIR numbers, names..." class="input" style="border:none;box-shadow:none;width:260px;padding:.4rem .6rem"/>
+        </div>
+
+        <button class="btn" id="openNotificationsBtn" title="Notifications">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2c3e50"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0 1 18 14.158V11a6 6 0 1 0-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="badge badge-high" id="notifCount" style="margin-left:6px;display:inline-block;padding:.12rem .5rem">3</span>
+        </button>
+
+        <div style="position:relative">
+          <button class="btn" id="openUserMenuBtn">
+            <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="User" style="height:30px;border-radius:999px">
+            <span style="margin-left:.5rem">Officer</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- NOTIFICATION DROPDOWN -->
+<div id="notificationDropdown" style="position:absolute;right:18px;top:76px;display:none;z-index:70">
+  <div class="card" style="width:320px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <strong>Notifications</strong>
+      <a href="#" id="clearNotifs" class="small-muted">Clear</a>
+    </div>
+
+    <div id="notificationList" style="max-height:220px;overflow:auto">
+      <div style="padding:10px;border-bottom:1px solid var(--border)">
+        <div style="font-weight:600">Loading notifications...</div>
+      </div>
+    </div>
+
+    <div style="margin-top:10px;text-align:right">
+      <a href="javascript:void(0)" class="small-muted">View all</a>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Officer Dropdown -->
+<div id="userDropdown" style="display:none">
+  <div class="dropdown-card">
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border)">
+      <p id="officerName" style="font-weight:600;margin:2px 0;font-size:0.95rem;color:var(--primary)">Officer</p>
+      <p id="officerBadge" class="small-muted" style="margin:2px 0">Badge #—</p>
+      <p id="officerEmail" class="small-muted" style="margin:2px 0">—</p>
+    </div>
+
+    <div style="padding:8px 0">
+      <a href="/officer/profile/edit" class="dropdown-item" style="display:block;width:100%;text-align:left;padding:10px 16px;font-size:0.9rem;color:#374151;text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='none'">
+        Profile Settings
+      </a>
+      <a href="/officer/preferences" class="dropdown-item" style="display:block;width:100%;text-align:left;padding:10px 16px;font-size:0.9rem;color:#374151;text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='none'">
+        Preferences
+      </a>
+      <a href="/help_center"  class="dropdown-item" style="display:block;width:100%;text-align:left;padding:10px 16px;font-size:0.9rem;color:#374151;text-decoration:none;transition:background 0.15s" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='none'">
+        Help & Support
+      </a>
+    </div>
+
+    <div style="border-top:1px solid var(--border);margin-top:4px"></div>
+
+    <a href="/logout" 
+       style="display:block;padding:10px 16px;font-size:0.9rem;color:#dc2626;text-decoration:none;transition:background 0.15s"
+       onmouseover="this.style.background='#fef2f2'" 
+       onmouseout="this.style.background='none'">
+      Sign Out
+    </a>
+  </div>
+</div>
+
+
+
+  
+
+  <!-- PAGE CONTAINER -->
+  <main class="container" style="padding-top:18px;padding-bottom:40px">
+    <!-- DASHBOARD HEADER -->
+    <section class="card" style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <h1 style="font-size:1.5rem">Welcome back, <span id="officerNameDisplay">Officer</span></h1>
+        <div class="small-muted">Police Department • Last login: <span id="lastLogin">—</span></div>
+      </div>
+      <div class="flex gap-2">
+        <button class="btn btn-accent" id="openCreateFirBtn">Create New FIR</button>
+        <button class="btn btn-secondary" id="openUploadEvidenceBtn">Upload Evidence</button>
+        <button class="btn" id="openAllCasesBtn">View All Cases</button>
+      </div>
+    </section>
+
+    <!-- STATS ROW -->
+    <section style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+      <div class="card" id="activeCasesCard">
+        <div class="small-muted">Active Cases</div>
+        <div id="activeCasesCount" style="font-weight:700;font-size:1.5rem">—</div>
+        <div id="activeCasesStatus" class="small-muted">Loading...</div>
+        <ul id="activeCasesList" class="small-muted" style="margin-top:8px;list-style:none;padding-left:0"></ul>
+      </div>
+      
+      <div class="card">
+        <div class="small-muted">Pending Actions</div>
+        <div style="font-weight:700;font-size:1.5rem;color:var(--warning)">0</div>
+        <div class="small-muted">Requires attention</div>
+      </div>
+      <div class="card">
+        <div class="small-muted">Resolved This Month</div>
+        <div style="font-weight:700;font-size:1.5rem;color:var(--success)">0</div>
+        <div class="small-muted"></div>
+      </div>
+      <div class="card">
+        <div class="small-muted">Team Performance</div>
+        <div style="font-weight:700;font-size:1.5rem;color:var(--accent)">0%</div>
+        <div class="small-muted">Above dept avg</div>
+      </div>
+    </section>
+
+    <!-- MAIN GRID -->
+    <section style="display:grid;grid-template-columns:2fr 1fr;gap:12px">
+      <!-- LEFT: Priority cases list -->
+      <div>
+        <div class="card" style="margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <h2 style="font-size:1.1rem">Priority Cases</h2>
+            <div class="small-muted">Showing top priority</div>
+          </div>
+
+          <div id="priorityCasesList" style="display:flex;flex-direction:column;gap:10px">
+            <!-- Sample case cards (dynamically replaced) -->
+            <!-- The JS below will populate real items -->
+          </div>
+        </div>
+
+        <!-- Performance & charts placeholder -->
+        
+        <div class="card">
+          <h3 style="margin-bottom:6px">Performance Analytics</h3>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;justify-content:space-between">
+            <!-- Case Resolution Trend -->
+            <div style="flex:1;min-width:240px;max-width:48%;">
+              <div class="small-muted" style="margin-bottom:4px;font-weight:500;color:var(--muted)">Case Resolution Trend <span style="color:var(--accent)">(Last 6 Months)</span></div>
+              <div style="width:100%;height:200px;position:relative;background:linear-gradient(90deg,#f8fafc,#fff);border-radius:8px;padding:10px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;">
+                <canvas id="resolutionTrendChart" style="width:100%;height:180px;display:block;max-width:100%;max-height:180px;"></canvas>
+              </div>
+              <div style="margin-top:6px;font-size:.85rem;color:var(--muted)">Displays monthly count of resolved or closed cases.</div>
+            </div>
+
+            <!-- Case Distribution -->
+            <div style="flex:1;min-width:240px;max-width:48%;">
+              <div class="small-muted" style="margin-bottom:4px;font-weight:500;color:var(--muted)">Case Distribution by Priority &amp; Status</div>
+              <div style="width:100%;height:200px;position:relative;background:linear-gradient(90deg,#f8fafc,#fff);border-radius:8px;padding:10px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;">
+                <canvas id="caseDistributionChart" style="width:100%;height:180px;display:block;max-width:100%;max-height:180px;"></canvas>
+              </div>
+              <div style="margin-top:6px;font-size:.85rem;color:var(--muted)">Shows proportion of High, Medium, Normal, and Resolved cases.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: sidebar with quick actions & officer alerts -->
+      <aside>
+        <div class="card" style="margin-bottom:12px">
+          <h3 style="margin-bottom:8px">Quick Actions</h3>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button class="btn btn-primary" id="openAnalyticsBtn">📊 Open Analytics</button>
+            <button class="btn btn-secondary" id="incidentMapBtn">🗺️ Incident Map</button>
+            <button class="btn btn-accent" id="sendAlertBtn">📢 Send Notification / Alert</button>
+            <button class="btn" id="viewEvidencesBtn">📎 View Evidences</button>
+          </div>
+        </div>
+
+        <!-- Send Notification / Alert Modal -->
+<div id="sendAlertModal" class="modal-backdrop" aria-hidden="true">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Send Notification / Alert</h3>
+      <button class="btn" id="closeSendAlert">Close</button>
+    </div>
+
+    <form id="sendAlertForm" class="grid grid-1" style="gap:10px;">
+      <div>
+        <label class="small-muted">Alert Title</label>
+        <input id="alertTitle" class="input" placeholder="e.g., Team Meeting Reminder" required>
+      </div>
+
+      <div>
+        <label class="small-muted">Message</label>
+        <textarea id="alertMessage" class="input" rows="4" placeholder="Write your message here..." required></textarea>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px;">
+        <button type="button" class="btn" id="cancelSendAlert">Cancel</button>
+        <button type="submit" class="btn btn-primary">Send Alert</button>
+      </div>
+
+      <div id="sendAlertResult" class="small-muted mt-2"></div>
+    </form>
+  </div>
+</div>
+
+
+
+
+
+
+<script>
+  const sendAlertModal = document.getElementById("sendAlertModal");
+  const sendAlertBtn = document.getElementById("sendAlertBtn");
+  const closeSendAlert = document.getElementById("closeSendAlert");
+  const cancelSendAlert = document.getElementById("cancelSendAlert");
+  
+  // Open / close handlers
+  sendAlertBtn?.addEventListener("click", () => sendAlertModal.style.display = "flex");
+  closeSendAlert?.addEventListener("click", () => sendAlertModal.style.display = "none");
+  cancelSendAlert?.addEventListener("click", () => sendAlertModal.style.display = "none");
+  
+  // Form submission
+  document.getElementById("sendAlertForm")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const title = document.getElementById("alertTitle").value.trim();
+    const message = document.getElementById("alertMessage").value.trim();
+    const resultEl = document.getElementById("sendAlertResult");
+    const token = localStorage.getItem("token") || localStorage.getItem("authToken") || "";
+  
+    if (!title || !message) {
+      resultEl.textContent = "⚠️ Please fill out both fields.";
+      resultEl.style.color = "var(--error)";
+      return;
+    }
+  
+    resultEl.textContent = "Sending...";
+    resultEl.style.color = "var(--muted)";
+  
+    try {
+      const res = await fetch("/api/officer/send_alert", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+        body: JSON.stringify({ title, message })
+      });
+  
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to send");
+  
+      resultEl.textContent = "✅ Alert sent successfully!";
+      resultEl.style.color = "var(--success)";
+      setTimeout(() => {
+        sendAlertModal.style.display = "none";
+        document.getElementById("sendAlertForm").reset();
+      }, 1000);
+    } catch (err) {
+      resultEl.textContent = "❌ Error sending alert.";
+      resultEl.style.color = "var(--error)";
+      console.error(err);
+    }
+  });
+  </script>
+
+  <!-- View Evidences Modal -->
+<div id="viewEvidencesModal" class="modal-backdrop" aria-hidden="true">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>View Evidences</h3>
+      <button class="btn" id="closeViewEvidences">Close</button>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+        <label class="small-muted">Filter by:</label>
+        <select id="evidenceFilterType" class="input" style="width:120px">
+          <option value="">All Evidences</option>
+          <option value="case">Case ID</option>
+          <option value="fir">FIR ID</option>
+        </select>
+        <input id="evidenceFilterId" class="input" placeholder="Enter Case/FIR ID" style="flex:1" disabled/>
+        <button class="btn btn-primary" id="searchEvidencesBtn">Search</button>
+      </div>
+    </div>
+
+    <div style="max-height:60vh;overflow-y:auto">
+      <div id="evidencesList" class="grid" style="gap:12px">
+        <div class="small-muted text-center py-4">Select filter type and enter ID to view evidences, or click "Search" to view all.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="card" style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <h3 style="margin-bottom:0">Officer Alerts</h3>
+            <button class="btn" id="refreshAlertsBtn" style="padding:4px 8px;font-size:0.8rem" title="Refresh alerts">🔄</button>
+          </div>
+          <div id="officerAlertsList" style="display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto">
+            <div class="small-muted text-center py-2">Loading alerts...</div>
+          </div>
+        </div>
+
+        <script>
+          // Smooth scroll to analytics section
+          document.getElementById("openAnalyticsBtn")?.addEventListener("click", () => {
+            window.location.href = "/analytics"; 
+            
+          });
+          
+          // Redirect to incident map page (to be created)
+          document.getElementById("incidentMapBtn")?.addEventListener("click", () => {
+            window.location.href = "/incident_map"; // Create this route in Flask later
+          });
+          
+          // View Evidences Modal handlers
+          const viewEvidencesModal = document.getElementById("viewEvidencesModal");
+          const viewEvidencesBtn = document.getElementById("viewEvidencesBtn");
+          const closeViewEvidences = document.getElementById("closeViewEvidences");
+          const evidenceFilterType = document.getElementById("evidenceFilterType");
+          const evidenceFilterId = document.getElementById("evidenceFilterId");
+          const searchEvidencesBtn = document.getElementById("searchEvidencesBtn");
+          
+          // Enable/disable filter ID input based on filter type
+          evidenceFilterType?.addEventListener("change", function() {
+            evidenceFilterId.disabled = !this.value;
+            if (!this.value) {
+              evidenceFilterId.value = "";
+            }
+          });
+          
+          // Open modal
+          viewEvidencesBtn?.addEventListener("click", () => {
+            viewEvidencesModal.style.display = "flex";
+            viewEvidencesModal.classList.add("open");
+          });
+          
+          // Close modal
+          closeViewEvidences?.addEventListener("click", () => {
+            viewEvidencesModal.style.display = "none";
+            viewEvidencesModal.classList.remove("open");
+          });
+          
+          // Safe localStorage access (handles tracking prevention)
+          function safeGetLocalStorageForEvidence(key) {
+            try {
+              return localStorage.getItem(key);
+            } catch (e) {
+              try {
+                return sessionStorage.getItem(key);
+              } catch (e2) {
+                return null;
+              }
+            }
+          }
+          
+          // Search/Load evidences
+          async function loadEvidences() {
+            const token = safeGetLocalStorageForEvidence("token") || safeGetLocalStorageForEvidence("authToken") || "";
+            const filterType = evidenceFilterType.value;
+            const filterId = evidenceFilterId.value.trim();
+            const evidencesList = document.getElementById("evidencesList");
+            
+            if (!token) {
+              evidencesList.innerHTML = '<div class="small-muted text-center py-4">Authentication required. Please log in again.</div>';
+              return;
+            }
+            
+            evidencesList.innerHTML = '<div class="small-muted text-center py-4">Loading evidences...</div>';
+            
+            try {
+              // Backend requires either case_id or fir_id, so we need a filter
+              if (!filterType || !filterId) {
+                evidencesList.innerHTML = '<div class="small-muted text-center py-4">Please select a filter type and enter a Case ID or FIR ID to view evidences.</div>';
+                return;
+              }
+              
+              let url = "/api/officer/evidence?";
+              if (filterType === "case") {
+                url += `case_id=${filterId}`;
+              } else if (filterType === "fir") {
+                url += `fir_id=${filterId}`;
+              }
+              
+              const res = await fetch(url, {
+                headers: { Authorization: `Bearer ${token}` }
+              });
+              
+              if (!res.ok) {
+                throw new Error(`HTTP ${res.status}`);
+              }
+              
+              const evidences = await res.json();
+              
+              if (!Array.isArray(evidences) || evidences.length === 0) {
+                evidencesList.innerHTML = '<div class="small-muted text-center py-4">No evidences found.</div>';
+                return;
+              }
+              
+              evidencesList.innerHTML = evidences.map((ev, index) => {
+                const uploadDate = ev.uploaded_at ? new Date(ev.uploaded_at).toLocaleString() : "—";
+                const evidenceId = ev._id;
+                const fileName = ev.filename || "evidence";
+                return `
+                  <div class="card" style="padding:12px">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+                      <div style="flex:1">
+                        <div style="font-weight:600;margin-bottom:4px">${ev.filename || "Evidence File"}</div>
+                        <div class="small-muted">Uploaded: ${uploadDate}</div>
+                        ${ev.notes ? `<div class="small-muted" style="margin-top:4px">Notes: ${ev.notes}</div>` : ""}
+                        ${ev.case_id ? `<div class="small-muted">Case ID: ${ev.case_id}</div>` : ""}
+                        ${ev.fir_id ? `<div class="small-muted">FIR ID: ${ev.fir_id}</div>` : ""}
+                      </div>
+                      <div style="display:flex;gap:8px">
+                        <button class="btn btn-primary" style="padding:6px 12px" onclick="downloadEvidence('${evidenceId}', '${fileName.replace(/'/g, "\\'")}')" id="downloadBtn_${index}">Download</button>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              }).join("");
+            } catch (err) {
+              console.error("Error loading evidences:", err);
+              evidencesList.innerHTML = '<div class="small-muted text-center py-4" style="color:var(--error)">Error loading evidences. Please try again.</div>';
+            }
+          }
+          
+          // Download evidence file with authentication
+          window.downloadEvidence = async function(evidenceId, filename) {
+            const token = safeGetLocalStorageForEvidence("token") || safeGetLocalStorageForEvidence("authToken") || "";
+            
+            if (!token) {
+              alert("Authentication required. Please log in again.");
+              window.location.href = "/login";
+              return;
+            }
+            
+            const btn = document.querySelector(`button[onclick*="${evidenceId}"]`);
+            const originalText = btn ? btn.textContent : "Download";
+            
+            if (btn) {
+              btn.disabled = true;
+              btn.textContent = "Downloading...";
+            }
+            
+            try {
+              const res = await fetch(`/api/officer/evidence/${evidenceId}/file`, {
+                headers: {
+                  Authorization: `Bearer ${token}`
+                }
+              });
+              
+              if (!res.ok) {
+                if (res.status === 401) {
+                  alert("Session expired. Please log in again.");
+                  window.location.href = "/login";
+                  return;
+                }
+                throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+              }
+              
+              // Get the file as a blob
+              const blob = await res.blob();
+              
+              // Get filename from Content-Disposition header or use provided filename
+              let downloadFilename = filename;
+              const contentDisposition = res.headers.get("Content-Disposition");
+              if (contentDisposition) {
+                const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                if (filenameMatch && filenameMatch[1]) {
+                  downloadFilename = filenameMatch[1].replace(/['"]/g, "");
+                }
+              }
+              
+              // Create a temporary download link
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = downloadFilename;
+              document.body.appendChild(a);
+              a.click();
+              
+              // Clean up
+              window.URL.revokeObjectURL(url);
+              document.body.removeChild(a);
+              
+            } catch (err) {
+              console.error("Error downloading evidence:", err);
+              alert(`Failed to download evidence: ${err.message}`);
+            } finally {
+              if (btn) {
+                btn.disabled = false;
+                btn.textContent = originalText;
+              }
+            }
+          };
+          
+          searchEvidencesBtn?.addEventListener("click", loadEvidences);
+          
+          </script>
+          
+
+
+        <!-- Team Collaboration -->
+<div class="card">
+  <h3 style="margin-bottom:8px">Team Collaboration</h3>
+  <div id="teamContainer" style="display:flex;flex-direction:column;gap:8px">
+    <div class="small-muted text-center py-2">Loading team members...</div>
+  </div>
+</div>
+
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <<!-- FOOTER -->
+<footer style="background:#0f172a;color:#fff;padding:48px 0;margin-top:32px">
+  <div style="max-width:1100px;margin:0 auto;padding:0 18px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:32px">
+      
+      <!-- Company Info -->
+      <div style="grid-column:span 2">
+        <div style="display:flex;align-items:center;margin-bottom:12px">
+          <img src="/static/images/newlogo1.png" alt="CrimeGuard Pro Logo" style="height:90px;width:auto;margin-right:12px">
+        </div>
+        <p style="color:#cbd5e1;margin-bottom:12px;max-width:500px">
+          Secure authentication gateway ensuring safe access to <strong>CrimeGuard Pro</strong> — 
+          a comprehensive crime management ecosystem designed for officers and agencies.
+        </p>
+
+        <div style="display:flex;gap:16px;margin-top:12px">
+          <!-- Twitter -->
+          <a href="javascript:void(0)" style="color:#94a3b8;transition:all 0.3s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/>
+            </svg>
+          </a>
+          <!-- LinkedIn -->
+          <a href="javascript:void(0)" style="color:#94a3b8;transition:all 0.3s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#94a3b8'">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Links -->
+      <div>
+        <h4 style="font-size:1.1rem;font-weight:600;margin-bottom:12px">Quick Links</h4>
+        <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px">
+          <li><a href="homepage_government_technology_platform.html" style="color:#cbd5e1;text-decoration:none" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#cbd5e1'">Home</a></li>
+          <li><a href="/login" style="color:#cbd5e1;text-decoration:none" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#cbd5e1'">Login</a></li>
+          <li><a href="document_center_secure_file_management.html" style="color:#cbd5e1;text-decoration:none" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#cbd5e1'">Documents</a></li>
+          <li><a href="/analytics" style="color:#cbd5e1;text-decoration:none" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#cbd5e1'">Analytics</a></li>
+        </ul>
+      </div>
+
+      <!-- Support -->
+      <div>
+        <h4 class="text-lg font-inter font-semibold mb-4">Support</h4>
+        <ul class="space-y-2">
+            <li><a href="/help_center" class="text-primary-200 hover:text-white transition-smooth">Help Center</a>
+            </li>
+            <li><a href="/contact" class="text-primary-200 hover:text-white transition-smooth">Contact Us</a></li>
+            <li><a href="/privacy_policy" class="text-primary-200 hover:text-white transition-smooth">Privacy Policy</a></li>
+            <li><a href="/terms_of_service" class="text-primary-200 hover:text-white transition-smooth">Terms of Service</a></li>
+            <li><a href="/accessibility" class="text-primary-200 hover:text-white transition-smooth">Accessibility</a></li>
+        </ul>
+    </div>
+</div>
+
+    <div style="border-top:1px solid #1e293b;margin-top:36px;padding-top:16px;text-align:center;color:#94a3b8;font-size:.9rem">
+      © 2025 <strong>CrimeGuard Pro</strong>. All Rights Reserved. | Secure authentication for justice and transparency.
+    </div>
+  </div>
+</footer>
+
+
+  <!-- ------------------------------
+       MODALS: Create FIR, Upload Evidence, View All Cases, Update Case, Confirm Delete
+       ------------------------------ -->
+  <!-- Create New FIR Modal -->
+  <div id="createFirModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="createFirTitle">
+      <div class="modal-header">
+        <h3 id="createFirTitle">Create New FIR</h3>
+        <div style="display:flex;gap:8px">
+          <button class="btn" id="closeCreateFir">Close</button>
+        </div>
+      </div>
+
+      <form id="createFirForm" class="grid grid-2" style="gap:12px">
+        <div>
+          <label class="small-muted">Title</label>
+          <input id="firTitle" class="input" required placeholder="Brief title (e.g., Theft near Market)"/>
+        </div>
+        <div>
+          <label class="small-muted">Category</label>
+          <select id="firCategory" class="input">
+            <option value="theft">Theft</option>
+            <option value="assault">Assault</option>
+            <option value="fraud">Fraud</option>
+            <option value="robbery">Robbery</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="small-muted">Complainant Name</label>
+          <input id="firComplainant" class="input" placeholder="Full name"/>
+        </div>
+        <div>
+          <label class="small-muted">Phone / Contact</label>
+          <input id="firContact" class="input" placeholder="Phone or email"/>
+        </div>
+
+        <div style="grid-column:1 / -1">
+          <label class="small-muted">Location</label>
+          <input id="firLocation" class="input" placeholder="Address or landmark"/>
+        </div>
+
+        <div style="grid-column:1 / -1">
+          <label class="small-muted">Description</label>
+          <textarea id="firDescription" rows="6" class="input" placeholder="Describe the incident"></textarea>
+        </div>
+
+        <div style="grid-column:1 / -1;display:flex;justify-content:flex-end;gap:8px">
+          <button type="button" class="btn" id="createFirCancel">Cancel</button>
+          <button type="submit" class="btn btn-accent" id="createFirSubmit">Submit FIR</button>
+        </div>
+
+        <div id="createFirResult" style="grid-column:1 / -1" class="small-muted"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Upload Evidence Modal -->
+  <div id="uploadEvidenceModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="uploadEvidenceTitle">
+      <div class="modal-header">
+        <h3 id="uploadEvidenceTitle">Upload Evidence</h3>
+        <button class="btn" id="closeUploadEvidence">Close</button>
+      </div>
+
+      <form id="uploadEvidenceForm" class="grid" style="gap:12px">
+        <div>
+          <label class="small-muted">Evidence Type</label>
+          <select id="evidenceType" class="input" required>
+            <option value="">Select type...</option>
+            <option value="case">Case</option>
+            <option value="fir">FIR</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="small-muted" id="evidenceIdLabel">Case/FIR ID</label>
+          <input id="evidenceCaseId" class="input" placeholder="Enter Case ID or FIR ID" required/>
+          <div class="xs small-muted">Enter the ID of the case or FIR to attach evidence to</div>
+        </div>
+
+        <div>
+          <label class="small-muted">Evidence Files (images, documents)</label>
+          <input id="evidenceFiles" type="file" multiple class="input" required/>
+          <div class="xs small-muted">Max recommended file size: 10MB per file. You can select multiple files.</div>
+        </div>
+
+        <div>
+          <label class="small-muted">Notes</label>
+          <textarea id="evidenceNotes" rows="4" class="input" placeholder="Notes about the evidence (where/how it was obtained)"></textarea>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:8px">
+          <button type="button" class="btn" id="uploadEvidenceCancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="uploadEvidenceSubmit">Upload</button>
+        </div>
+
+        <div id="uploadEvidenceResult" class="small-muted"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- View All Cases Modal -->
+<div id="allCasesModal" class="modal-backdrop" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="allCasesTitle">
+    <div class="modal-header">
+      <h3 id="allCasesTitle">All Cases & FIRs</h3>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="casesFilter" placeholder="Filter by status, priority, keyword..." class="input" style="width:260px"/>
+        <button class="btn" id="closeAllCases">Close</button>
+      </div>
+    </div>
+
+    <div style="margin-top:12px;max-height:70vh;overflow-y:auto">
+      
+      <!-- CASES SECTION -->
+      <h4 class="text-lg font-semibold text-gray-800 mb-2 mt-2 border-b pb-1">Assigned Cases</h4>
+      <table class="table w-full text-sm" id="casesTable">
+        <thead class="bg-gray-100 text-gray-700">
+          <tr>
+            <th>FIR # / ID</th>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Filed On</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="casesTbody" class="divide-y divide-gray-200">
+          <!-- Dynamically populated -->
+        </tbody>
+      </table>
+
+     <!-- =========================
+     OFFICER FIRs SECTION
+     ========================= -->
+<h4 class="text-lg font-semibold text-gray-800 mt-6 mb-2 border-b pb-1">
+  Officer FIRs
+</h4>
+
+<table class="table w-full text-sm border border-gray-200 rounded-lg shadow-sm" id="firsTable">
+  <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
+    <tr>
+      <th class="px-4 py-2 text-left">FIR ID</th>
+      <th class="px-4 py-2 text-left">Title</th>
+      <th class="px-4 py-2 text-left">Category</th>
+      <th class="px-4 py-2 text-left">Complainant</th>
+      <th class="px-4 py-2 text-left">Status</th>
+      <th class="px-4 py-2 text-left">Created On</th>
+      <th class="px-4 py-2 text-center">Actions</th>
+    </tr>
+  </thead>
+  <tbody id="firsTbody" class="divide-y divide-gray-200 text-gray-800">
+    <!-- Populated dynamically via JS -->
+  </tbody>
+</table>
+
+</div>
+</div>
+</div>
+
+<!-- =========================
+     VIEW FIR MODAL
+     ========================= -->
+<div id="viewFirModal" class="modal-backdrop" aria-hidden="true">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="viewFirTitle">FIR Details</h3>
+      <button class="btn" id="closeViewFir">Close</button>
+    </div>
+
+    <div id="viewFirContent" class="space-y-3 text-sm text-gray-700 p-2">
+      <p><strong>Title:</strong> <span id="viewFirTitleText">—</span></p>
+      <p><strong>Category:</strong> <span id="viewFirCategory">—</span></p>
+      <p><strong>Complainant:</strong> <span id="viewFirComplainant">—</span></p>
+      <p><strong>Contact:</strong> <span id="viewFirContact">—</span></p>
+      <p><strong>Location:</strong> <span id="viewFirLocation">—</span></p>
+      <p><strong>Description:</strong> <span id="viewFirDescription">—</span></p>
+      <p><strong>Status:</strong> <span id="viewFirStatus">—</span></p>
+      <p><strong>Created On:</strong> <span id="viewFirCreatedAt">—</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- =========================
+     UPDATE CASE / FIR MODAL
+     ========================= -->
+<div id="updateCaseModal" class="modal-backdrop" aria-hidden="true">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="updateCaseTitle">Update Case / FIR</h3>
+      <button class="btn" id="closeUpdateCase">Close</button>
+    </div>
+
+    <form id="updateCaseForm" class="grid grid-cols-2 gap-4">
+      <input type="hidden" id="updateCaseId">
+      <input type="hidden" id="updateType"> <!-- case or fir -->
+
+      <div>
+        <label class="small-muted">Status</label>
+        <select id="updateStatus" class="input">
+          <option>Pending</option>
+          <option>In Progress</option>
+          <option>Resolved</option>
+          <option>Closed</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="small-muted">Priority</label>
+        <select id="updatePriority" class="input">
+          <option>Normal</option>
+          <option>Medium</option>
+          <option>High</option>
+        </select>
+      </div>
+
+      <div class="col-span-2">
+        <label class="small-muted">Officer Notes</label>
+        <textarea id="updateNotes" rows="5" class="input" placeholder="Enter officer notes or update details..."></textarea>
+      </div>
+
+      <div class="col-span-2 flex justify-end gap-3">
+        <button type="button" class="btn" id="updateCancel">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="updateSubmit">Save</button>
+      </div>
+
+      <div id="updateCaseResult" class="text-sm text-gray-500 mt-2 col-span-2"></div>
+    </form>
+  </div>
+</div>
+
+<!-- =========================
+     CONFIRM DELETE MODAL
+     ========================= -->
+<div id="confirmDeleteModal" class="modal-backdrop" aria-hidden="true">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Confirm Delete</h3>
+      <button class="btn" id="closeConfirmDelete">Close</button>
+    </div>
+
+    <div class="text-sm text-gray-700">
+      <p>This action cannot be undone. Are you sure you want to delete this record?</p>
+      <div class="flex justify-end gap-3 mt-4">
+        <button class="btn" id="confirmDeleteCancel">Cancel</button>
+        <button class="btn danger" id="confirmDeleteYes">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- View Case Modal -->
+<div id="viewCaseModal" class="modal-backdrop" aria-hidden="true">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="viewCaseTitle">Case / FIR Details</h3>
+      <button class="btn" id="closeViewCase">Close</button>
+    </div>
+
+    <div id="viewCaseContent" class="grid grid-cols-2 gap-4 text-sm">
+      <div>
+        <strong>Title:</strong> <span id="viewCaseTitleText">—</span>
+      </div>
+      <div>
+        <strong>Category:</strong> <span id="viewCaseCategory">—</span>
+      </div>
+      <div>
+        <strong>Status:</strong> <span id="viewCaseStatus">—</span>
+      </div>
+      <div>
+        <strong>Priority:</strong> <span id="viewCasePriority">—</span>
+      </div>
+      <div style="grid-column: 1 / -1;">
+        <strong>Description:</strong>
+        <p id="viewCaseDescription" class="mt-1 text-gray-700">—</p>
+      </div>
+      <div style="grid-column: 1 / -1;">
+        <strong>Location:</strong>
+        <p id="viewCaseLocation" class="mt-1 text-gray-700">—</p>
+      </div>
+      <div style="grid-column: 1 / -1;">
+        <strong>Assigned Officer:</strong>
+        <p id="viewCaseOfficer" class="mt-1 text-gray-700">—</p>
+      </div>
+      <div style="grid-column: 1 / -1;">
+        <strong>Filed On:</strong>
+        <p id="viewCaseDate" class="mt-1 text-gray-700">—</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Update Case / FIR Modal -->
+<div id="updateCaseModal" class="modal-backdrop" aria-hidden="true">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="updateCaseTitle">Update Case / FIR</h3>
+      <button class="btn" id="closeUpdateCase">Close</button>
+    </div>
+
+    <form id="updateCaseForm" class="grid grid-2 gap-4">
+      <input type="hidden" id="updateCaseId">
+      <input type="hidden" id="updateType"> <!-- case or fir -->
+
+      <div>
+        <label class="small-muted">Status</label>
+        <select id="updateStatus" class="input">
+          <option>Pending</option>
+          <option>In Progress</option>
+          <option>Resolved</option>
+          <option>Closed</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="small-muted">Priority</label>
+        <select id="updatePriority" class="input">
+          <option>Normal</option>
+          <option>Medium</option>
+          <option>High</option>
+        </select>
+      </div>
+
+      <div style="grid-column:1 / -1">
+        <label class="small-muted">Officer Notes</label>
+        <textarea id="updateNotes" rows="5" class="input"></textarea>
+      </div>
+
+      <div style="grid-column:1 / -1;display:flex;justify-content:flex-end;gap:8px">
+        <button type="button" class="btn" id="updateCancel">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="updateSubmit">Save</button>
+      </div>
+
+      <div id="updateCaseResult" class="small-muted mt-2"></div>
+    </form>
+  </div>
+</div>
+
+<!-- Confirm Delete Modal -->
+<div id="confirmDeleteModal" class="modal-backdrop" aria-hidden="true">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Confirm Delete</h3>
+      <button class="btn" id="closeConfirmDelete">Close</button>
+    </div>
+    <div>
+      <p>Are you sure you want to delete this record? This action cannot be undone.</p>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+        <button class="btn" id="confirmDeleteCancel">Cancel</button>
+        <button class="btn danger" id="confirmDeleteYes">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <!-- ------------------------------
+       SCRIPTS: modal handling, fetch wiring, CRUD logic
+  <!-- === USER DATA FETCH (from DB) === -->
+<script>
+async function loadActiveCases() {
+  const countEl = document.getElementById("activeCasesCount");
+  const statusEl = document.getElementById("activeCasesStatus");
+  const listEl = document.getElementById("activeCasesList");
+  const token = localStorage.getItem("token") || localStorage.getItem("authToken") || "";
+
+  if (!token) return console.warn("No auth token found");
+
+  countEl.textContent = "—";
+  statusEl.textContent = "Loading...";
+
+  try {
+    const res = await fetch("/api/cases", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const allCases = Array.isArray(data) ? data : data.cases || [];
+
+    // Filter for active/open/in-progress
+    const activeCases = allCases.filter(
+      (c) => ["open", "active", "in progress", "in-progress"].includes((c.status || "").toLowerCase())
+    );
+
+    countEl.textContent = activeCases.length || 0;
+
+    if (activeCases.length > 0) {
+      statusEl.textContent = "Updated just now";
+      listEl.innerHTML = activeCases
+        .slice(0, 3)
+        .map(
+          (c) =>
+            `<li>• ${c.title || "Untitled"} <span style="opacity:0.7">(${c.category || "—"})</span></li>`
+        )
+        .join("");
+    } else {
+      statusEl.textContent = "No active cases found";
+      listEl.innerHTML = "";
+    }
+  } catch (err) {
+    console.error("Failed to load active cases:", err);
+    countEl.textContent = "—";
+    statusEl.textContent = "Error fetching data";
+  }
+}
+
+// Call when page loads
+document.addEventListener("DOMContentLoaded", loadActiveCases);
+</script>
+
+
+
+
+<!-- Chart.js for visualization -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  (async function loadOfficerData() {
+    const el = id => document.getElementById(id);
+    const tokenKeys = ['token', 'authToken', 'jwt', 'accessToken'];
+  
+    // Try all possible token keys
+    function readToken() {
+      for (const k of tokenKeys) {
+        const val = localStorage.getItem(k);
+        if (val) return val;
+      }
+      return null;
+    }
+  
+    const token = readToken();
+    if (!token) {
+      console.warn('No token found, redirecting to login...');
+      return window.location.href = '/login';
+    }
+  
+    try {
+      const res = await fetch('/api/me', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) {
+        console.warn('Token invalid or expired. Redirecting...');
+        tokenKeys.forEach(k => localStorage.removeItem(k));
+        return window.location.href = '/login';
+      }
+  
+      const data = await res.json();
+      const u = data.user || {};
+  
+      // Handle officer name (combine first+last if needed)
+      const officerName =
+        u.name ||
+        `${u.first_name || ''} ${u.last_name || ''}`.trim() ||
+        'Officer';
+      const officerId = u.badge_id || u._id || u.id || '—';
+      const officerEmail = u.email || '—';
+      const lastLogin = u.last_login
+        ? new Date(u.last_login).toLocaleString()
+        : (u.updated_at ? new Date(u.updated_at).toLocaleString() : '—');
+  
+      // Update all relevant UI sections
+      if (el('officerNameDisplay')) el('officerNameDisplay').textContent = officerName;
+      if (el('lastLogin')) el('lastLogin').textContent = lastLogin;
+  
+      // Navbar user button
+      const userBtn = document.querySelector('#openUserMenuBtn span');
+      if (userBtn) userBtn.textContent = officerName;
+
+      // Update dropdown with officer info
+      if (el('officerName')) el('officerName').textContent = officerName;
+      if (el('officerBadge')) el('officerBadge').textContent = `Badge #${officerId}`;
+      if (el('officerEmail')) el('officerEmail').textContent = officerEmail;
+
+
+  
+    } catch (err) {
+      console.error('Error fetching officer info:', err);
+      tokenKeys.forEach(k => localStorage.removeItem(k));
+      window.location.href = '/login';
+    }
+  })();
+  </script>
+  <script>
+    /* ------------------------------
+       Helper utilities
+    ------------------------------ */
+    const $ = id => document.getElementById(id);
+    function openModal(el){ if(!el) return; el.classList.add('open'); el.style.display='flex'; setTimeout(()=>el.classList.add('open'),10); el.style.pointerEvents='auto'; el.classList.add('open'); }
+    function closeModal(el){ if(!el) return; el.classList.remove('open'); el.style.pointerEvents='none'; el.style.display='none'; }
+
+    /* ------------------------------
+    <script>
+/* ------------------------------
+   Dropdown Toggles (Notifications & User Menu)
+------------------------------ */
+const notifBtn = document.getElementById('openNotificationsBtn');
+const notifDropdown = document.getElementById('notificationDropdown');
+const userBtn = document.getElementById('openUserMenuBtn');
+const userDropdown = document.getElementById('userDropdown');
+
+/**
+ * Helper function to toggle dropdown visibility safely
+ */
+function toggleDropdown(dropdown, show) {
+  if (!dropdown) return;
+  if (show) {
+    dropdown.style.display = 'block';
+    // Force reflow to ensure display is applied before opacity
+    dropdown.offsetHeight;
+    dropdown.style.opacity = '1';
+  } else {
+    dropdown.style.opacity = '0';
+    // Delay hiding to allow fade-out animation
+    setTimeout(() => {
+      if (dropdown.style.opacity === '0') {
+        dropdown.style.display = 'none';
+      }
+    }, 150);
+  }
+  dropdown.style.transition = 'opacity 0.15s ease-in-out';
+}
+
+/**
+ * Toggle Notifications Dropdown
+ */
+if (notifBtn && notifDropdown) {
+  notifBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isVisible = notifDropdown.style.display === 'block';
+    toggleDropdown(notifDropdown, !isVisible);
+    toggleDropdown(userDropdown, false);
+  });
+}
+
+/**
+ * Toggle User Menu Dropdown
+ */
+if (userBtn && userDropdown) {
+  userBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isVisible = userDropdown.style.display === 'block';
+    toggleDropdown(userDropdown, !isVisible);
+    toggleDropdown(notifDropdown, false);
+  });
+}
+
+/**
+ * Close dropdowns when clicking outside
+ */
+document.addEventListener('click', (e) => {
+  if (notifDropdown && !notifDropdown.contains(e.target) && !notifBtn.contains(e.target)) {
+    toggleDropdown(notifDropdown, false);
+  }
+  if (userDropdown && !userDropdown.contains(e.target) && !userBtn.contains(e.target)) {
+    toggleDropdown(userDropdown, false);
+  }
+});
+
+/**
+ * Close dropdowns when pressing Escape
+ */
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    toggleDropdown(notifDropdown, false);
+    toggleDropdown(userDropdown, false);
+  }
+});
+</script>
+<script>
+
+    /* ------------------------------
+       Open / Close modals wiring
+    ------------------------------ */
+    const createFirModal = $('createFirModal');
+    const uploadEvidenceModal = $('uploadEvidenceModal');
+    const allCasesModal = $('allCasesModal');
+    const updateCaseModal = $('updateCaseModal');
+    const confirmDeleteModal = $('confirmDeleteModal');
+
+    // Buttons that open
+    const openCreateFirBtn = $('openCreateFirBtn');
+    const openUploadEvidenceBtn = $('openUploadEvidenceBtn');
+    const openAllCasesBtn = $('openAllCasesBtn');
+    const quickCreateFir = $('quickCreateFir');
+    const quickUploadEvidence = $('quickUploadEvidence');
+
+    // Close buttons
+    $('closeCreateFir').addEventListener('click', ()=>closeModal(createFirModal));
+    $('createFirCancel').addEventListener('click', ()=>closeModal(createFirModal));
+    $('closeUploadEvidence').addEventListener('click', ()=>closeModal(uploadEvidenceModal));
+    $('uploadEvidenceCancel').addEventListener('click', ()=>closeModal(uploadEvidenceModal));
+    $('closeAllCases').addEventListener('click', ()=>closeModal(allCasesModal));
+    $('closeUpdateCase').addEventListener('click', ()=>closeModal(updateCaseModal));
+    $('closeConfirmDelete').addEventListener('click', ()=>closeModal(confirmDeleteModal));
+    $('confirmDeleteCancel').addEventListener('click', ()=>closeModal(confirmDeleteModal));
+
+    // triggers
+[openCreateFirBtn, quickCreateFir].forEach(b => {
+  if (b) b.addEventListener('click', () => openModal(createFirModal));
+});
+
+[openUploadEvidenceBtn, quickUploadEvidence].forEach(b => {
+  if (b) b.addEventListener('click', () => openModal(uploadEvidenceModal));
+});
+
+// “View All Cases” button — loads both cases and FIRs
+if (openAllCasesBtn) {
+  openAllCasesBtn.addEventListener('click', () => {
+    openModal(allCasesModal);
+    if (typeof loadAllCases === 'function') loadAllCases();
+    if (typeof loadOfficerFIRs === 'function') loadOfficerFIRs();
+  });
+}
+
+
+
+    // close on ESC
+    document.addEventListener('keydown', (e) => {
+      if(e.key === 'Escape'){
+        const viewEvidencesModalEl = document.getElementById('viewEvidencesModal');
+        [createFirModal, uploadEvidenceModal, allCasesModal, updateCaseModal, confirmDeleteModal, viewEvidencesModalEl].forEach(m=>m && closeModal(m));
+      }
+    });
+
+    /* ------------------------------
+       CRUD & UI functions
+       - These functions call your backend endpoints:
+         POST /api/cases        -> create
+         GET  /api/cases        -> list all or search (adjust as needed)
+         GET  /api/cases/:id    -> get one
+         PUT  /api/cases/:id    -> update
+         DELETE /api/cases/:id  -> delete
+         POST /api/cases/:id/evidence (multipart) -> upload evidence
+       Adjust endpoint names as required by your Flask app.
+    ------------------------------ */
+
+    // Utility: format iso date
+    function fmtDate(s){ if(!s) return '—'; try{ return new Date(s).toLocaleString(); } catch(e){ return s; } }
+
+    // Show top priority sample if none (and replace when real data loads)
+    function renderPriorityCases(cases=[]) {
+      const container = document.getElementById('priorityCasesList');
+      container.innerHTML = '';
+      if(!cases || cases.length === 0){
+        // placeholder sample
+        const sampleHTML = `
+          <div class="card" style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div style="flex:1">
+              <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+                <div class="badge badge-high">HIGH</div>
+                <div style="font-weight:700">Armed Robbery - Downtown</div>
+              </div>
+              <div class="small-muted">Complainant: Sarah Martinez • Filed: Aug 4, 2025 9:15 AM</div>
+              <div style="margin-top:8px" class="small-muted">Main Street & 5th Ave • Due Aug 6</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-left:12px">
+              <button class="btn btn-primary btn-view" data-id="sample-high">Update</button>
+              <button class="btn" data-id="sample-high-view" onclick="openSampleDetails()">View Details</button>
+            </div>
+          </div>
+        `;
+        container.innerHTML = sampleHTML;
+        return;
+      }
+
+      cases.forEach(c=>{
+        const priorityLower = (c.priority||'Normal').toLowerCase();
+        const badgeClass = priorityLower === 'high' ? 'badge-high' : (priorityLower === 'medium' ? 'badge-med' : 'badge-normal');
+        const tr = document.createElement('div');
+        tr.className = 'card';
+        tr.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div style="flex:1">
+              <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+                <div class="badge ${badgeClass}">${c.priority || 'Normal'}</div>
+                <div style="font-weight:700">${c.title || c.case_number || 'Untitled Case'}</div>
+              </div>
+              <div class="small-muted">Complainant: ${c.complainant_name || c.citizen_name || '—'} • Filed: ${fmtDate(c.created_at)}</div>
+              <div style="margin-top:8px">${(c.summary || c.description || '').slice(0,180)}${(c.description && c.description.length>180)?'...':''}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-left:12px">
+              <button class="btn btn-primary btn-update" data-id="${c._id || c.id}">Update</button>
+              <button class="btn btn-outline btn-view" data-id="${c._id || c.id}">View</button>
+            </div>
+          </div>
+        `;
+        container.appendChild(tr);
+      });
+
+      // wire up view/update button handlers
+      document.querySelectorAll('.btn-view').forEach(b=>{
+        b.addEventListener('click', (ev)=> {
+          const id = ev.currentTarget.dataset.id;
+          openCaseView(id);
+        });
+      });
+      document.querySelectorAll('.btn-update').forEach(b=>{
+        b.addEventListener('click', (ev)=>{
+          const id = ev.currentTarget.dataset.id;
+          openUpdateCaseModal(id);
+        });
+      });
+    }
+
+    // Fetch all cases for modal table (and small per-page lists)
+    async function loadAllCases(){
+      const tbody = $('casesTbody');
+      tbody.innerHTML = `<tr><td colspan="7" class="small-muted">Loading cases...</td></tr>`;
+      try {
+        const token = localStorage.getItem('token') || localStorage.getItem('authToken') || '';
+        const res = await fetch('/api/cases', { headers: {'Authorization': 'Bearer ' + token} });
+        if(!res.ok){ tbody.innerHTML = `<tr><td colspan="7" class="small-muted">Failed to load cases (status ${res.status})</td></tr>`; return; }
+        const data = await res.json();
+        const cases = Array.isArray(data) ? data : (data.cases || []);
+        if(!cases.length){ tbody.innerHTML = `<tr><td colspan="7" class="small-muted">No cases found.</td></tr>`; return; }
+        tbody.innerHTML = '';
+        cases.forEach(c=>{
+          const id = c._id || c.id || '';
+          const priorityLower = (c.priority||'Normal').toLowerCase();
+          const priorityLabel = (priorityLower==='high'?'HIGH':(priorityLower==='medium'?'MED':'NORMAL'));
+          tbody.insertAdjacentHTML('beforeend', `
+            <tr>
+              <td>${id}</td>
+              <td>${(c.title||'Untitled')}</td>
+              <td>${(c.category||'—')}</td>
+              <td>${priorityLabel}</td>
+              <td>${c.status||'Open'}</td>
+              <td>${fmtDate(c.created_at)}</td>
+              <td>
+                <div class="actions">
+                  <button class="btn btn-outline btn-table-view" data-id="${id}">View</button>
+                  <button class="btn btn-primary btn-table-edit" data-id="${id}">Update</button>
+                  <button class="danger btn-table-delete" data-id="${id}">Delete</button>
+                </div>
+              </td>
+            </tr>
+          `);
+        });
+
+        // attach events
+        document.querySelectorAll('.btn-table-view').forEach(b => b.addEventListener('click', e => openCaseView(e.currentTarget.dataset.id)));
+        document.querySelectorAll('.btn-table-edit').forEach(b => b.addEventListener('click', e => openUpdateCaseModal(e.currentTarget.dataset.id)));
+        document.querySelectorAll('.btn-table-delete').forEach(b => b.addEventListener('click', e => confirmDeleteCase(e.currentTarget.dataset.id)));
+      } catch (err) {
+        console.error('loadAllCases', err);
+        tbody.innerHTML = `<tr><td colspan="7" class="small-muted">Error loading cases.</td></tr>`;
+      }
+    }
+
+   // View Case Details - Opens dedicated read-only modal
+async function openCaseView(caseId) {
+  const token = localStorage.getItem('token') || localStorage.getItem('authToken') || '';
+
+  try {
+    const res = await fetch(`/api/cases/${caseId}`, {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+
+    if (!res.ok) {
+      alert('Unable to fetch case details.');
+      return;
+    }
+
+    const c = await res.json();
+
+    // Populate View Case Modal fields
+    document.getElementById('viewCaseTitleText').textContent = c.title || '—';
+    document.getElementById('viewCaseCategory').textContent = c.category || '—';
+    document.getElementById('viewCaseStatus').textContent = c.status || '—';
+    document.getElementById('viewCasePriority').textContent = c.priority || '—';
+    document.getElementById('viewCaseDescription').textContent = c.description || '—';
+    document.getElementById('viewCaseLocation').textContent = c.location || '—';
+    document.getElementById('viewCaseOfficer').textContent = c.assigned_name || '—';
+    document.getElementById('viewCaseDate').textContent = new Date(c.created_at).toLocaleString();
+
+    // Open the View Case Modal
+    openModal(document.getElementById('viewCaseModal'));
+
+  } catch (err) {
+    console.error('openCaseView', err);
+    alert('Error opening case details.');
+  }
+}
+
+// Close the View Case Modal
+document.getElementById('closeViewCase')?.addEventListener('click', () => {
+  closeModal(document.getElementById('viewCaseModal'));
+});
+
+
+    // Fill update modal with existing case info (and keep inputs editable)
+    async function fillUpdateModalWithCase(c){
+      $('updateCaseId').value = c._id || c.id || '';
+      $('updateStatus').value = c.status || 'Pending';
+      $('updatePriority').value = c.priority || 'Normal';
+      $('updateNotes').value = (c.officer_notes || '') + '\n\n';
+      $('updateCaseTitle')?.setAttribute('data-case-title', c.title || '');
+      $('updateCaseResult').textContent = '';
+    }
+
+    // Open update modal by fetching case by id
+    async function openUpdateCaseModal(caseId){
+      try{
+        const token = localStorage.getItem('token') || localStorage.getItem('authToken') || '';
+        const res = await fetch(`/api/cases/${caseId}`, { headers: {'Authorization': 'Bearer ' + token} });
+        if(!res.ok){ alert('Unable to fetch case details for update'); return; }
+        const c = await res.json();
+        await fillUpdateModalWithCase(c);
+        openModal(updateCaseModal);
+      } catch(err){
+        console.error('openUpdateCaseModal', err);
+        alert('Failed to open update modal');
+      }
+    }
+
+    // Confirm delete
+    let deleteTargetId = null;
+    function confirmDeleteCase(caseId){
+      deleteTargetId = caseId;
+      openModal(confirmDeleteModal);
+    }
+    $('confirmDeleteYes').addEventListener('click', async ()=>{
+      if(!deleteTargetId) return;
+      try{
+        const token = localStorage.getItem('token') || localStorage.getItem('authToken') || '';
+        const res = await fetch(`/api/cases/${deleteTargetId}`, { method: 'DELETE', headers: {'Authorization':'Bearer ' + token} });
+        if(!res.ok){ const r = await res.json().catch(()=>({})); alert('Delete failed: ' + (r.error || res.status)); closeModal(confirmDeleteModal); return; }
+        alert('Case deleted');
+        closeModal(confirmDeleteModal);
+        loadAllCases();
+        // refresh small list
+        fetchAndRenderPriorityCases();
+      } catch (err){ console.error('delete error', err); alert('Delete failed'); closeModal(confirmDeleteModal); }
+    });
+
+    /* ------------------------------
+       Form submit handlers
+    ------------------------------ */
+
+    // ------------------------------
+// Create FIR (Officer Dashboard)
+// ------------------------------
+$('createFirForm').addEventListener('submit', async (ev) => {
+  ev.preventDefault();
+
+  // Collect input values
+  const title = $('firTitle').value.trim();
+  const category = $('firCategory').value;
+  const complainant = $('firComplainant').value.trim();
+  const contact = $('firContact').value.trim();
+  const suspect = $('firSuspect') ? $('firSuspect').value.trim() : '';
+  const location = $('firLocation').value.trim();
+  const description = $('firDescription').value.trim();
+  const resultEl = $('createFirResult');
+
+  // Validate required fields
+  if (!title || !location || !description) {
+    resultEl.textContent = '⚠️ Please fill Title, Location, and Description.';
+    resultEl.style.color = 'var(--error)';
+    return;
+  }
+
+  // Display loading state
+  resultEl.textContent = '⏳ Submitting FIR...';
+  resultEl.style.color = 'var(--muted)';
+
+  try {
+    const token = localStorage.getItem('token') || localStorage.getItem('authToken') || '';
+
+    if (!token) {
+      resultEl.textContent = '❌ Authentication missing. Please log in again.';
+      resultEl.style.color = 'var(--error)';
+      return;
+    }
+
+    // Payload for backend
+    const payload = {
+      title,
+      category,
+      complainant_name: complainant || 'Unknown Citizen',
+      contact: contact || '—',
+      suspect: suspect || 'N/A',
+      location,
+      description
+    };
+
+    // API request to officer FIR creation route
+    const res = await fetch('/api/officer/fir', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    // Handle failure
+    if (!res.ok) {
+      console.error('FIR Error:', data);
+      resultEl.textContent = data.error || '❌ Failed to create FIR. Please try again.';
+      resultEl.style.color = 'var(--error)';
+      return;
+    }
+
+    // Success!
+    const newId = data.fir_id || data.case_id || data.id || '—';
+    resultEl.textContent = `✅ FIR created successfully. ID: ${newId}`;
+    resultEl.style.color = 'var(--success)';
+
+    // Close modal and refresh case lists
+    setTimeout(() => {
+      closeModal(createFirModal);
+      $('createFirForm').reset();
+      resultEl.textContent = '';
+      if (typeof loadAllCases === 'function') loadAllCases();
+      if (typeof fetchAndRenderPriorityCases === 'function') fetchAndRenderPriorityCases();
+    }, 1000);
+  } catch (err) {
+    console.error('createFIR error:', err);
+    resultEl.textContent = '⚠️ Network or server error while submitting FIR.';
+    resultEl.style.color = 'var(--error)';
+  }
+});
+
+
+    // Upload Evidence
+    $('uploadEvidenceForm').addEventListener('submit', async (ev)=>{
+      ev.preventDefault();
+      const evidenceType = $('evidenceType').value;
+      const caseIdOrFIR = $('evidenceCaseId').value.trim();
+      const files = $('evidenceFiles').files;
+      const notes = $('evidenceNotes').value.trim();
+      const resultEl = $('uploadEvidenceResult');
+
+      // Validation
+      if(!evidenceType){
+        resultEl.textContent = 'Please select evidence type (Case or FIR).';
+        resultEl.style.color = 'var(--error)';
+        return;
+      }
+
+      if(!caseIdOrFIR){
+        resultEl.textContent = 'Please enter a Case ID or FIR ID.';
+        resultEl.style.color = 'var(--error)';
+        return;
+      }
+
+      if(!files || files.length === 0){
+        resultEl.textContent = 'Please select at least one file to upload.';
+        resultEl.style.color = 'var(--error)';
+        return;
+      }
+
+      // Check file sizes
+      let fileTooLarge = false;
+      for(const file of files){
+        if(file.size > 10 * 1024 * 1024){
+          resultEl.textContent = `File "${file.name}" is too large (max 10MB).`;
+          resultEl.style.color = 'var(--error)';
+          fileTooLarge = true;
+          break;
+        }
+      }
+      if(fileTooLarge) return;
+
+      resultEl.textContent = 'Uploading...';
+      resultEl.style.color = 'var(--muted)';
+
+      try {
+        const token = localStorage.getItem('token') || localStorage.getItem('authToken') || '';
+        if(!token){
+          resultEl.textContent = 'Authentication missing. Please log in again.';
+          resultEl.style.color = 'var(--error)';
+          return;
+        }
+
+        const formData = new FormData();
+        // Append files
+        for(const f of files){
+          formData.append('files', f);
+        }
+        
+        // Append case_id or fir_id based on type
+        if(evidenceType === 'case'){
+          formData.append('case_id', caseIdOrFIR);
+        } else if(evidenceType === 'fir'){
+          formData.append('fir_id', caseIdOrFIR);
+        }
+        
+        formData.append('notes', notes);
+
+        // Call the officer evidence upload endpoint
+        const res = await fetch('/api/officer/evidence', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + token
+            // Don't set Content-Type - browser will set it with boundary for FormData
+          },
+          body: formData
+        });
+
+        // Handle response
+        let data = {};
+        try {
+          const text = await res.text();
+          if(text) {
+            data = JSON.parse(text);
+          }
+        } catch(e) {
+          console.error('Error parsing response:', e);
+          if(!res.ok) {
+            resultEl.textContent = `Upload failed (${res.status}): ${res.statusText}`;
+            resultEl.style.color = 'var(--error)';
+            return;
+          }
+        }
+        
+        if(!res.ok){
+          resultEl.textContent = data.error || `Upload failed (${res.status}): ${res.statusText}`;
+          resultEl.style.color = 'var(--error)';
+          if(data.errors && Array.isArray(data.errors)){
+            console.error('Upload errors:', data.errors);
+            resultEl.textContent += '\n' + data.errors.join(', ');
+          }
+          console.error('Evidence upload failed:', res.status, data);
+          return;
+        }
+
+        // Success
+        const uploadedCount = data.uploaded_files ? data.uploaded_files.length : 0;
+        resultEl.textContent = `✅ Successfully uploaded ${uploadedCount} file(s)!`;
+        resultEl.style.color = 'var(--success)';
+        
+        if(data.errors && data.errors.length > 0){
+          console.warn('Some files had errors:', data.errors);
+        }
+
+        // Close modal and reset form after delay
+        setTimeout(()=>{
+          closeModal(uploadEvidenceModal);
+          $('uploadEvidenceForm').reset();
+          resultEl.textContent = '';
+        }, 1500);
+      } catch (err) {
+        console.error('uploadEvidence error:', err);
+        resultEl.textContent = 'Network or server error while uploading. Please try again.';
+        resultEl.style.color = 'var(--error)';
+      }
+    });
+
+    // Update label based on evidence type selection
+    $('evidenceType')?.addEventListener('change', function(){
+      const type = this.value;
+      const label = $('evidenceIdLabel');
+      const input = $('evidenceCaseId');
+      if(type === 'case'){
+        if(label) label.textContent = 'Case ID';
+        if(input) input.placeholder = 'Enter Case ID';
+      } else if(type === 'fir'){
+        if(label) label.textContent = 'FIR ID';
+        if(input) input.placeholder = 'Enter FIR ID';
+      } else {
+        if(label) label.textContent = 'Case/FIR ID';
+        if(input) input.placeholder = 'Enter Case ID or FIR ID';
+      }
+    });
+
+    // Update Case submit
+    $('updateCaseForm').addEventListener('submit', async (ev)=>{
+      ev.preventDefault();
+      const id = $('updateCaseId').value;
+      const status = $('updateStatus').value;
+      const priority = $('updatePriority').value;
+      const notes = $('updateNotes').value;
+      const resultEl = $('updateCaseResult');
+
+      if(!id){ resultEl.textContent = 'No case selected'; resultEl.style.color = 'var(--error)'; return; }
+
+      resultEl.textContent = 'Saving...'; resultEl.style.color = 'var(--muted)';
+
+      try{
+        const token = localStorage.getItem('token') || localStorage.getItem('authToken') || '';
+        const payload = { status, priority, officer_notes: notes, updated_at: new Date().toISOString() };
+        const res = await fetch(`/api/cases/${id}`, { method:'PUT', headers: {'Content-Type':'application/json','Authorization':'Bearer ' + token}, body: JSON.stringify(payload) });
+        const data = await res.json().catch(()=>({}));
+        if(!res.ok){ resultEl.textContent = data.error || 'Update failed'; resultEl.style.color='var(--error)'; return; }
+        resultEl.textContent = 'Case updated successfully.';
+        resultEl.style.color = 'var(--success)';
+        setTimeout(()=>{ closeModal(updateCaseModal); loadAllCases(); fetchAndRenderPriorityCases(); }, 900);
+      } catch(err){
+        console.error('update case', err);
+        resultEl.textContent = 'Failed to update case';
+        resultEl.style.color = 'var(--error)';
+      }
+    });
+
+    /* ------------------------------
+       Initialization: fetch some data to render default lists
+    ------------------------------ */
+    async function fetchAndRenderPriorityCases(){
+      try{
+        const token = localStorage.getItem('token') || localStorage.getItem('authToken') || '';
+        const res = await fetch('/api/cases?priority=high&limit=5', { headers: {'Authorization':'Bearer '+token} });
+        if(!res.ok){ renderPriorityCases([]); return; }
+        const data = await res.json();
+        const cases = Array.isArray(data) ? data : (data.cases || []);
+        renderPriorityCases(cases.slice(0,6));
+      } catch(err){
+        console.error('fetch priority', err);
+        renderPriorityCases([]);
+      }
+    }
+
+    // initial calls
+    fetchAndRenderPriorityCases();
+
+    /* ------------------------------
+       Additional UX helpers (search, filter)
+    ------------------------------ */
+    $('globalSearch').addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter'){
+        const q = e.target.value.trim();
+        openModal(allCasesModal);
+        loadAllCases(); // ideally, pass filter query to backend (e.g., /api/cases?q=...)
+      }
+    });
+
+    $('casesFilter').addEventListener('input', (e)=>{
+      const q = e.target.value.trim().toLowerCase();
+      // client-side filter of rows in the table
+      document.querySelectorAll('#casesTbody tr').forEach(tr=>{
+        const txt = tr.innerText.toLowerCase();
+        tr.style.display = txt.includes(q) ? '' : 'none';
+      });
+    });
+
+    // small utility: open sample details demonstration
+    function openSampleDetails(){
+      alert('This would open a detailed view for the sample case.');
+    }
+
+    /* ------------------------------
+       Make sure to close modals initially
+    ------------------------------ */
+    const viewEvidencesModalInit = document.getElementById('viewEvidencesModal');
+    [createFirModal, uploadEvidenceModal, allCasesModal, updateCaseModal, confirmDeleteModal, viewEvidencesModalInit].forEach(m=>{ if(m){ m.style.display='none'; m.classList.remove('open'); }});
+  </script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Consolidated dashboard JS: active cases, analytics, and user info -->
+<script>
+(() => {
+  // Keep references to chart instances so we can destroy them on reload
+  let trendChart = null;
+  let distChart = null;
+
+  // Ensure Chart.js doesn't maintain aspect ratio (we use fixed container heights)
+  if (window.Chart) Chart.defaults.maintainAspectRatio = false;
+
+  const tokenKeys = ['token','authToken','jwt','accessToken'];
+  const $ = id => document.getElementById(id);
+
+  function readToken() {
+    for (const k of tokenKeys) {
+      const v = localStorage.getItem(k);
+      if (v) return v;
+    }
+    return null;
+  }
+
+  async function fetchJson(url, opts={}) {
+    try {
+      const res = await fetch(url, opts);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return await res.json();
+    } catch (e) {
+      console.error('fetchJson', url, e);
+      return null;
+    }
+  }
+
+  function fmtDate(s){ if(!s) return '—'; try{ return new Date(s).toLocaleString(); } catch(e){ return s; } }
+
+  // Load officer/user details
+  async function loadOfficer() {
+    const token = readToken();
+    if (!token) { console.warn('No token'); return; }
+
+    const data = await fetchJson('/api/me', { headers: { 'Authorization': 'Bearer ' + token } });
+    if (!data) return;
+    const u = data.user || data || {};
+    const name = u.name || ( (u.first_name||'') + ' ' + (u.last_name||'') ).trim() || 'Officer';
+    const id = u.badge_id || u._id || u.id || '—';
+    const email = u.email || '—';
+    const lastLogin = u.last_login ? new Date(u.last_login).toLocaleString() : (u.updated_at?new Date(u.updated_at).toLocaleString():'—');
+
+    if ($('officerNameDisplay')) $('officerNameDisplay').textContent = name;
+    if ($('lastLogin')) $('lastLogin').textContent = lastLogin;
+    const userBtnSpan = document.querySelector('#openUserMenuBtn span');
+    if (userBtnSpan) userBtnSpan.textContent = name;
+
+    // Update dropdown with officer info (preserve structure)
+    const officerNameEl = document.getElementById('officerName');
+    const officerBadgeEl = document.getElementById('officerBadge');
+    const officerEmailEl = document.getElementById('officerEmail');
+    
+    if (officerNameEl) officerNameEl.textContent = name;
+    if (officerBadgeEl) officerBadgeEl.textContent = `Badge #${escapeHtml(id)}`;
+    if (officerEmailEl) officerEmailEl.textContent = escapeHtml(email);
+  }
+
+  // Active cases card
+  async function loadActiveCases() {
+    const token = readToken();
+    if (!token) return console.warn('No token for active cases');
+    const countEl = $('activeCasesCount'), statusEl = $('activeCasesStatus'), listEl = $('activeCasesList');
+    if (countEl) countEl.textContent = '—';
+    if (statusEl) statusEl.textContent = 'Loading...';
+    if (listEl) listEl.innerHTML = '';
+
+    const data = await fetchJson('/api/cases', { headers: { 'Authorization': 'Bearer ' + token } });
+    const allCases = Array.isArray(data) ? data : (data && data.cases) || [];
+    const activeCases = allCases.filter(c => ['open','active','in progress','in-progress','pending'].includes((c.status||'').toLowerCase()));
+
+    if (countEl) countEl.textContent = activeCases.length || '0';
+    if (statusEl) statusEl.textContent = activeCases.length ? 'Updated just now' : 'No active cases found';
+    if (listEl && activeCases.length) {
+      listEl.innerHTML = activeCases.slice(0,3).map(c => `<li>• ${escapeHtml(c.title || 'Untitled')} <span style="opacity:.7">(${escapeHtml(c.category||'—')})</span></li>`).join('');
+    }
+  }
+
+  // Destroy chart safely - also destroy by canvas ID
+  function destroyChart(ch) { 
+    try { 
+      if (ch && typeof ch.destroy === 'function') {
+        ch.destroy(); 
+      }
+    } catch(e){
+      console.warn('Error destroying chart:', e);
+    }
+  }
+
+  // Destroy chart by canvas element
+  function destroyChartByCanvas(canvasId) {
+    try {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      
+      // Get Chart.js instance from canvas if it exists
+      const chartInstance = Chart.getChart(canvas);
+      if (chartInstance) {
+        chartInstance.destroy();
+      }
+    } catch(e) {
+      console.warn('Error destroying chart by canvas:', e);
+    }
+  }
+
+  // Load analytics and render charts
+  async function loadPerformanceAnalytics() {
+    const token = readToken();
+    if (!token) return console.warn('No token for analytics');
+
+    // Destroy existing charts first
+    destroyChart(trendChart);
+    destroyChart(distChart);
+    destroyChartByCanvas('resolutionTrendChart');
+    destroyChartByCanvas('caseDistributionChart');
+    
+    // Clear chart references
+    trendChart = null;
+    distChart = null;
+
+    const data = await fetchJson('/api/cases', { headers: { 'Authorization': 'Bearer ' + token } });
+    const cases = Array.isArray(data) ? data : (data && data.cases) || [];
+
+    // monthly keys last 6 months
+    const monthly = {};
+    const now = new Date();
+    for (let i=5;i>=0;i--){ const d = new Date(now.getFullYear(), now.getMonth()-i,1); monthly[d.toLocaleString('default',{month:'short'})]=0; }
+    cases.forEach(c=>{
+      const st = (c.status||'').toLowerCase();
+      if (['resolved','closed'].includes(st)) {
+        const d = new Date(c.updated_at || c.created_at || Date.now());
+        const k = d.toLocaleString('default',{month:'short'});
+        if (monthly[k] !== undefined) monthly[k]++;
+      }
+    });
+    const labels = Object.keys(monthly), values = Object.values(monthly);
+
+    // priority distribution
+    const pr = {High:0,Medium:0,Normal:0,Resolved:0};
+    cases.forEach(c=>{
+      const st = (c.status||'').toLowerCase();
+      const p = (c.priority||'Normal').toLowerCase();
+      if (['resolved','closed'].includes(st)) pr.Resolved++;
+      else if (p==='high') pr.High++;
+      else if (p==='medium') pr.Medium++;
+      else pr.Normal++;
+    });
+
+    // ensure canvases present
+    const tCanvas = $('resolutionTrendChart'), dCanvas = $('caseDistributionChart');
+    if (!tCanvas || !dCanvas) {
+      console.warn('Chart canvases missing');
+      return;
+    }
+
+    // Double-check and destroy any existing charts on these canvases
+    destroyChartByCanvas('resolutionTrendChart');
+    destroyChartByCanvas('caseDistributionChart');
+
+    try {
+      const ctx1 = tCanvas.getContext('2d');
+      trendChart = new Chart(ctx1, {
+        type: 'line',
+        data: { labels, datasets: [{ label:'Resolved Cases', data: values, borderColor:'#22c55e', backgroundColor:'rgba(34,197,94,0.12)', tension:0.25, fill:true }]},
+        options: { responsive:true, maintainAspectRatio:false, scales:{ y:{ beginAtZero:true } }, plugins:{ legend:{ display:false } } }
+      });
+
+      const ctx2 = dCanvas.getContext('2d');
+      distChart = new Chart(ctx2, {
+        type: 'doughnut',
+        data: { labels: ['High','Medium','Normal','Resolved'], datasets:[{ data:[pr.High,pr.Medium,pr.Normal,pr.Resolved], backgroundColor:['#ef4444','#f59e0b','#3b82f6','#22c55e'] }]},
+        options: { responsive:true, maintainAspectRatio:false, cutout:'65%', plugins:{ legend:{ position:'bottom', labels:{ boxWidth:12 } } } }
+      });
+    } catch(e) {
+      console.error('Error creating charts:', e);
+    }
+  }
+
+  // Escape HTML helper
+  function escapeHtml(s){ if(s===null||s===undefined) return ''; return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;'); }
+
+  // Initialize on DOM ready - only run once
+  if (!window.dashboardInitialized) {
+    window.dashboardInitialized = true;
+    document.addEventListener('DOMContentLoaded', () => {
+      loadOfficer();
+      loadActiveCases();
+      loadPerformanceAnalytics();
+
+      // expose for debugging
+      window.reloadAnalytics = loadPerformanceAnalytics;
+      window.reloadActiveCases = loadActiveCases;
+      window.reloadOfficer = loadOfficer;
+    });
+  }
+})();
+</script>
+<script>
+  /* =============================
+     Modal Helpers
+  ============================= */
+  function openModal(modal) {
+    modal.style.display = "flex";
+    modal.setAttribute("aria-hidden", "false");
+  }
+  function closeModal(modal) {
+    modal.style.display = "none";
+    modal.setAttribute("aria-hidden", "true");
+  }
+  
+  /* =============================
+     LOAD OFFICER FIRs
+  ============================= */
+  async function loadOfficerFIRs() {
+    const token = localStorage.getItem("token") || localStorage.getItem("authToken") || "";
+    const firsTbody = document.getElementById("firsTbody");
+    if (!firsTbody) return;
+  
+    firsTbody.innerHTML = `
+      <tr>
+        <td colspan="7" class="text-center text-gray-500 py-4">Loading FIRs...</td>
+      </tr>`;
+  
+    try {
+      const res = await fetch("/api/officer/fir", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      const json = await res.json().catch(() => ({}));
+      const firs = Array.isArray(json) ? json : json.firs || [];
+  
+      if (!res.ok) {
+        firsTbody.innerHTML = `
+          <tr><td colspan="7" class="text-center text-red-500">Failed to load FIRs.</td></tr>`;
+        return;
+      }
+  
+      if (firs.length === 0) {
+        firsTbody.innerHTML = `
+          <tr><td colspan="7" class="text-center text-gray-400">No FIRs found.</td></tr>`;
+        return;
+      }
+  
+      firsTbody.innerHTML = firs
+        .map(
+          (fir) => `
+        <tr class="hover:bg-gray-50 transition">
+          <td>${fir._id || "—"}</td>
+          <td>${fir.title || "—"}</td>
+          <td>${fir.category || "—"}</td>
+          <td>${fir.complainant_name || "—"}</td>
+          <td>${fir.status || "Pending"}</td>
+          <td>${new Date(fir.created_at).toLocaleString()}</td>
+          <td class="flex gap-2 justify-center">
+            <button class="btn small" onclick="viewFIR('${fir._id}')">View</button>
+            <button class="btn btn-primary small" onclick="openUpdateModal('${fir._id}')">Update</button>
+            <button class="btn danger small" onclick="deleteFIR('${fir._id}')">Delete</button>
+          </td>
+        </tr>`
+        )
+        .join("");
+    } catch (err) {
+      console.error("Error loading FIRs:", err);
+      firsTbody.innerHTML = `
+        <tr><td colspan="7" class="text-center text-red-500">Error fetching FIRs.</td></tr>`;
+    }
+  }
+  
+  /* =============================
+     VIEW FIR DETAILS
+  ============================= */
+  async function viewFIR(id) {
+    const token = localStorage.getItem("token") || localStorage.getItem("authToken") || "";
+    try {
+      const res = await fetch(`/api/officer/fir/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const fir = await res.json();
+      if (!res.ok) return alert(fir.error || "Error fetching FIR details");
+  
+      // Populate modal fields
+      document.getElementById("viewFirTitleText").textContent = fir.title || "—";
+      document.getElementById("viewFirCategory").textContent = fir.category || "—";
+      document.getElementById("viewFirComplainant").textContent = fir.complainant_name || "—";
+      document.getElementById("viewFirContact").textContent = fir.contact || "—";
+      document.getElementById("viewFirLocation").textContent = fir.location || "—";
+      document.getElementById("viewFirDescription").textContent = fir.description || "—";
+      document.getElementById("viewFirStatus").textContent = fir.status || "Pending";
+      document.getElementById("viewFirCreatedAt").textContent = new Date(fir.created_at).toLocaleString();
+  
+      openModal(document.getElementById("viewFirModal"));
+    } catch (err) {
+      console.error("Error viewing FIR:", err);
+      alert("Failed to load FIR details");
+    }
+  }
+  
+  document.getElementById("closeViewFir").addEventListener("click", () => {
+    closeModal(document.getElementById("viewFirModal"));
+  });
+  
+  /* =============================
+     OPEN UPDATE MODAL
+  ============================= */
+  async function openUpdateModal(firId) {
+    const token = localStorage.getItem("token") || localStorage.getItem("authToken") || "";
+    try {
+      const res = await fetch(`/api/officer/fir/${firId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const fir = await res.json();
+      if (!res.ok) return alert(fir.error || "Error loading FIR");
+  
+      document.getElementById("updateCaseId").value = firId;
+      document.getElementById("updateType").value = "fir";
+      document.getElementById("updateStatus").value = fir.status || "Pending";
+      document.getElementById("updatePriority").value = fir.priority || "Normal";
+      document.getElementById("updateNotes").value = fir.officer_notes || "";
+  
+      openModal(document.getElementById("updateCaseModal"));
+    } catch (err) {
+      console.error("Error loading FIR for update:", err);
+    }
+  }
+  
+  /* =============================
+     SUBMIT FIR / CASE UPDATE
+  ============================= */
+  document.getElementById("updateCaseForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const id = document.getElementById("updateCaseId").value;
+    const type = document.getElementById("updateType").value;
+    const status = document.getElementById("updateStatus").value;
+    const priority = document.getElementById("updatePriority").value;
+    const notes = document.getElementById("updateNotes").value;
+  
+    const token = localStorage.getItem("token") || localStorage.getItem("authToken") || "";
+    const resultEl = document.getElementById("updateCaseResult");
+    resultEl.textContent = "Saving...";
+  
+    const url = type === "fir" ? `/api/officer/fir/${id}` : `/api/cases/${id}/update`;
+  
+    try {
+      const res = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status, priority, officer_notes: notes }),
+      });
+  
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to update");
+  
+      resultEl.textContent = "✅ Updated successfully!";
+      setTimeout(() => {
+        closeModal(document.getElementById("updateCaseModal"));
+        loadOfficerFIRs();
+      }, 1000);
+    } catch (err) {
+      console.error("Error updating:", err);
+      resultEl.textContent = "❌ Error updating record.";
+    }
+  });
+  
+  document.getElementById("closeUpdateCase").addEventListener("click", () => {
+    closeModal(document.getElementById("updateCaseModal"));
+  });
+  document.getElementById("updateCancel").addEventListener("click", () => {
+    closeModal(document.getElementById("updateCaseModal"));
+  });
+  
+  /* =============================
+     DELETE FIR
+  ============================= */
+  async function deleteFIR(id) {
+    const confirmModal = document.getElementById("confirmDeleteModal");
+    openModal(confirmModal);
+  
+    document.getElementById("confirmDeleteYes").onclick = async () => {
+      const token = localStorage.getItem("token") || localStorage.getItem("authToken") || "";
+      try {
+        const res = await fetch(`/api/officer/fir/${id}`, {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Delete failed");
+  
+        alert("🗑️ FIR deleted successfully!");
+        closeModal(confirmModal);
+        loadOfficerFIRs();
+      } catch (err) {
+        console.error("Delete error:", err);
+        alert("Error deleting FIR");
+      }
+    };
+  
+    document.getElementById("confirmDeleteCancel").onclick = () => closeModal(confirmModal);
+    document.getElementById("closeConfirmDelete").onclick = () => closeModal(confirmModal);
+  }
+  
+  /* =============================
+     NOTIFICATIONS
+  ============================= */
+  (async function () {
+    const notifList = document.getElementById("notificationList");
+    const clearBtn = document.getElementById("clearNotifs");
+    let notifications = [];
+  
+    function renderNotifications() {
+      notifList.innerHTML = "";
+      if (notifications.length === 0) {
+        notifList.innerHTML = `<div class="p-2 text-sm text-gray-500">No notifications available.</div>`;
+        return;
+      }
+  
+      notifications
+        .slice(-5)
+        .reverse()
+        .forEach((n) => {
+          notifList.innerHTML += `
+          <div class="p-2 border-b border-gray-200">
+            <div class="font-semibold">${n.title}</div>
+            <div class="text-xs text-gray-500">${n.details} • ${n.time}</div>
+          </div>`;
+        });
+    }
+  
+    clearBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      notifications = [];
+      renderNotifications();
+    });
+  
+    async function fetchNotifications() {
+      const token = localStorage.getItem("token") || localStorage.getItem("authToken") || "";
+      if (!token) return;
+  
+      try {
+        const res = await fetch("/api/cases", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        const cases = Array.isArray(data) ? data : data.cases || [];
+  
+        notifications = cases.map((c) => {
+          const action = c.deleted_at
+            ? "Deleted Case"
+            : c.updated_at && c.created_at !== c.updated_at
+            ? "Updated Case"
+            : "Registered Case";
+          return {
+            title: action,
+            details: `FIR #${c._id || "Unknown"}`,
+            time: new Date(c.updated_at || c.created_at).toLocaleTimeString(),
+          };
+        });
+  
+        renderNotifications();
+      } catch (err) {
+        console.error("Notification fetch error:", err);
+        notifList.innerHTML = `<div class="p-2 text-gray-500 text-sm">Error loading notifications.</div>`;
+      }
+    }
+  
+    fetchNotifications();
+    setInterval(fetchNotifications, 10000);
+  })();
+  </script>
+  
+  <script>
+    async function loadTeamCollaboration() {
+      const token = localStorage.getItem("token") || localStorage.getItem("authToken") || "";
+      const container = document.getElementById("teamContainer");
+      if (!container) return;
+    
+      // Initial loading message
+      container.innerHTML = `
+        <div class="small-muted text-center py-2">Loading team members...</div>
+      `;
+    
+      try {
+        const res = await fetch("/api/officer/team", {
+          headers: { "Authorization": `Bearer ${token}` },
+        });
+    
+        const data = await res.json();
+        if (!res.ok) {
+          container.innerHTML = `
+            <div class="text-center text-red-500 small-muted">
+              Failed to load team members.
+            </div>`;
+          return;
+        }
+    
+        if (!Array.isArray(data) || data.length === 0) {
+          container.innerHTML = `
+            <div class="text-center text-gray-500 small-muted">
+              No other officers available.
+            </div>`;
+          return;
+        }
+    
+        // Clear and populate
+        container.innerHTML = "";
+        data.forEach(officer => {
+          const statusColor =
+            officer.status === "Online" ? "color:#16a34a" :
+            officer.status === "Away" ? "color:#f59e0b" :
+            "color:#6b7280";
+    
+          const officerCard = document.createElement("div");
+          officerCard.innerHTML = `
+            <div style="display:flex;align-items:center;gap:8px;">
+              <img src="${officer.photo || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}"
+                   alt="${officer.name || 'Officer'}"
+                   style="width:36px;height:36px;border-radius:999px;object-fit:cover;">
+              <div>
+                <div style="font-weight:600;">${officer.name || "Officer"}</div>
+                <div class="small-muted">${officer.email || "N/A"}</div>
+                <div class="small-muted" style="${statusColor}">
+                  ${officer.status || "Offline"}
+                </div>
+              </div>
+            </div>
+          `;
+          container.appendChild(officerCard);
+        });
+      } catch (err) {
+        console.error("Error loading team:", err);
+        container.innerHTML = `
+          <div class="text-center text-red-500 small-muted">
+            Error fetching team members.
+          </div>`;
+      }
+    }
+    
+    // Auto-load when page is ready
+    window.addEventListener("load", loadTeamCollaboration);
+    </script>
+    
+    <script>
+      /* =============================
+         OFFICER ALERTS
+      ============================= */
+      async function loadOfficerAlerts() {
+        const alertsList = document.getElementById("officerAlertsList");
+        const refreshBtn = document.getElementById("refreshAlertsBtn");
+        
+        if (!alertsList) return;
+        
+        // Safe localStorage access
+        function safeGetToken() {
+          try {
+            return localStorage.getItem("token") || localStorage.getItem("authToken") || "";
+          } catch (e) {
+            try {
+              return sessionStorage.getItem("token") || sessionStorage.getItem("authToken") || "";
+            } catch (e2) {
+              return "";
+            }
+          }
+        }
+        
+        const token = safeGetToken();
+        
+        if (!token) {
+          alertsList.innerHTML = '<div class="small-muted text-center py-2">Authentication required. Please log in.</div>';
+          return;
+        }
+        
+        // Show loading state
+        if (refreshBtn) refreshBtn.disabled = true;
+        alertsList.innerHTML = '<div class="small-muted text-center py-2">Loading alerts...</div>';
+        
+        try {
+          const res = await fetch("/api/officer/alerts", {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          
+          if (!res.ok) {
+            if (res.status === 401) {
+              alertsList.innerHTML = '<div class="small-muted text-center py-2" style="color:var(--error)">Session expired. Please log in again.</div>';
+              return;
+            }
+            throw new Error(`HTTP ${res.status}`);
+          }
+          
+          const alerts = await res.json();
+          
+          if (!Array.isArray(alerts) || alerts.length === 0) {
+            alertsList.innerHTML = '<div class="small-muted text-center py-2">No alerts available.</div>';
+            return;
+          }
+          
+          // Render alerts
+          alertsList.innerHTML = alerts.map(alert => {
+            const title = alert.title || "Alert";
+            const message = alert.message || "";
+            const sentBy = alert.sent_by || "System";
+            const sentAt = alert.sent_at || alert.created_at || "";
+            
+            // Format date
+            let timeDisplay = "—";
+            if (sentAt) {
+              try {
+                const date = new Date(sentAt);
+                if (!isNaN(date.getTime())) {
+                  const now = new Date();
+                  const diffMs = now - date;
+                  const diffMins = Math.floor(diffMs / 60000);
+                  const diffHours = Math.floor(diffMs / 3600000);
+                  const diffDays = Math.floor(diffMs / 86400000);
+                  
+                  if (diffMins < 1) {
+                    timeDisplay = "Just now";
+                  } else if (diffMins < 60) {
+                    timeDisplay = `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+                  } else if (diffHours < 24) {
+                    timeDisplay = `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+                  } else if (diffDays < 7) {
+                    timeDisplay = `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+                  } else {
+                    timeDisplay = date.toLocaleDateString() + " " + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                  }
+                }
+              } catch (e) {
+                timeDisplay = sentAt;
+              }
+            }
+            
+            // Escape HTML to prevent XSS
+            function escapeHtml(text) {
+              if (!text) return "";
+              const div = document.createElement("div");
+              div.textContent = text;
+              return div.innerHTML;
+            }
+            
+            return `
+              <div style="padding:10px;border-bottom:1px solid var(--border);border-radius:4px;background:var(--surface);transition:background 0.15s" 
+                   onmouseover="this.style.background='#f0f0f0'" 
+                   onmouseout="this.style.background='var(--surface)'">
+                <div style="font-weight:600;margin-bottom:4px;color:var(--primary);font-size:0.9rem">${escapeHtml(title)}</div>
+                ${message ? `<div style="color:var(--muted);font-size:0.85rem;margin-bottom:4px;line-height:1.4">${escapeHtml(message)}</div>` : ""}
+                <div class="small-muted" style="font-size:0.75rem;display:flex;justify-content:space-between;align-items:center">
+                  <span>By: ${escapeHtml(sentBy)}</span>
+                  <span>${timeDisplay}</span>
+                </div>
+              </div>
+            `;
+          }).join("");
+          
+        } catch (err) {
+          console.error("Error loading alerts:", err);
+          alertsList.innerHTML = '<div class="small-muted text-center py-2" style="color:var(--error)">Error loading alerts. Please try again.</div>';
+        } finally {
+          if (refreshBtn) refreshBtn.disabled = false;
+        }
+      }
+      
+      // Load alerts on page load
+      document.addEventListener("DOMContentLoaded", () => {
+        loadOfficerAlerts();
+        
+        // Refresh button
+        const refreshBtn = document.getElementById("refreshAlertsBtn");
+        if (refreshBtn) {
+          refreshBtn.addEventListener("click", () => {
+            loadOfficerAlerts();
+          });
+        }
+      });
+      
+      // Auto-refresh alerts every 30 seconds
+      setInterval(() => {
+        loadOfficerAlerts();
+      }, 30000);
+    </script>
+    
+</body>
+</html>

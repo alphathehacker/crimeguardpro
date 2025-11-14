@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Legal Documents Center - CrimeGuard Pro</title>
+  <meta name="description" content="Access legal documents, laws, regulations, and legal resources from official sources." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { 50: '#f8fafc', 100: '#f1f5f9', 800: '#1e293b', 900: '#0f172a' },
+            accent: { 500: '#e67e22', 600: '#c2410c' },
+            success: { 50: '#f0fdf4', 500: '#22c55e' },
+            error: { 50: '#fef2f2', 500: '#ef4444' },
+            warning: { 50: '#fffbeb', 500: '#f59e0b' }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    /* THEME & BASE */
+    :root{
+      --primary: #2c3e50; --accent: #e67e22; --success: #22c55e; --warning: #f39c12; --error: #e74c3c;
+      --bg: #ffffff; --surface: #f8f9fa; --muted: #7f8c8d; --border: #e5e7eb;
+      --card-shadow: 0 2px 8px rgba(44,62,80,0.08); --modal-shadow: 0 10px 30px rgba(12,18,24,0.12);
+      --max-w: 1300px; font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+    }
+    html,body{height:100%;margin:0;background:var(--surface);color:var(--primary);-webkit-font-smoothing:antialiased}
+    a{color:inherit;text-decoration:none}
+    .container{max-width:var(--max-w);margin:0 auto;padding:18px}
+
+    .card{background:var(--bg);border-radius:.6rem;padding:16px;border:1px solid var(--border);box-shadow:var(--card-shadow)}
+    header{background:var(--bg);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:60}
+    .logo{height:44px}
+
+    /* Document Card Hover Effect */
+    .doc-card {
+      transition: all 0.3s ease;
+    }
+    .doc-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(44,62,80,0.15);
+    }
+
+    /* External Link Icon Animation */
+    .external-link-icon {
+      transition: transform 0.2s ease;
+    }
+    .doc-card:hover .external-link-icon {
+      transform: translate(2px, -2px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="container flex items-center justify-between" style="height:72px">
+      <div class="flex items-center gap-3">
+        <img src="/static/images/newlogo.png" alt="CrimeGuard Pro" class="logo">
+        <div>
+          <div style="font-weight:700;font-size:1.05rem">CrimeGuard Pro</div>
+          <div class="text-xs text-primary-600">Legal Documents Center</div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <a href="/" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition">
+          ← Back to Home
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="container" style="padding-top:24px;padding-bottom:40px">
+
+    <!-- HERO SECTION -->
+    <section class="mb-8">
+      <div class="card bg-gradient-to-r from-primary-800 to-primary-900 text-white p-8">
+        <h1 class="text-3xl font-bold mb-3 flex items-center gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          Legal Documents Center
+        </h1>
+        <p class="text-lg opacity-90 mb-4">Access official legal documents, laws, regulations, and legal resources from trusted sources</p>
+        <div class="flex items-center gap-2 text-sm opacity-75">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          All links redirect to official government and legal institution websites
+        </div>
+      </div>
+    </section>
+
+    <!-- SEARCH & FILTER -->
+    <section class="mb-6">
+      <div class="card">
+        <div class="flex flex-col md:flex-row gap-4 items-center">
+          <div class="flex-1 w-full">
+            <div class="relative">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+              <input 
+                type="text" 
+                id="searchInput" 
+                placeholder="Search legal documents, laws, or regulations..." 
+                class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent-500 focus:border-accent-500 transition outline-none"
+              />
+            </div>
+          </div>
+          <div class="flex gap-2 flex-wrap">
+            <button class="category-filter px-4 py-2 bg-accent-500 text-white rounded-lg font-semibold hover:bg-accent-600 transition" data-category="all">
+              All Categories
+            </button>
+            <button class="category-filter px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition" data-category="criminal">
+              Criminal Law
+            </button>
+            <button class="category-filter px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition" data-category="civil">
+              Civil Law
+            </button>
+            <button class="category-filter px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition" data-category="constitutional">
+              Constitutional
+            </button>
+            <button class="category-filter px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition" data-category="procedural">
+              Procedural Law
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      <div class="card text-center">
+        <div class="text-2xl font-bold text-primary-800 mb-1" id="totalDocs">0</div>
+        <div class="text-sm text-primary-600">Total Documents</div>
+      </div>
+      <div class="card text-center">
+        <div class="text-2xl font-bold text-accent-500 mb-1" id="activeCategories">0</div>
+        <div class="text-sm text-primary-600">Categories</div>
+      </div>
+      <div class="card text-center">
+        <div class="text-2xl font-bold text-success-500 mb-1" id="officialSources">0</div>
+        <div class="text-sm text-primary-600">Official Sources</div>
+      </div>
+    </section>
+
+    <!-- DOCUMENTS GRID -->
+    <section>
+      <div id="documentsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Documents will be dynamically loaded here -->
+      </div>
+      <div id="noResults" class="card text-center py-12 hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <p class="text-lg font-semibold text-primary-800 mb-2">No documents found</p>
+        <p class="text-sm text-primary-600">Try adjusting your search or filter criteria</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer style="background:var(--primary);color:#fff;padding:18px 0;margin-top:40px">
+    <div class="container flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-2">
+        <img src="/static/images/newlogo1.png" style="height:44px">
+        <div>
+          <div style="font-weight:700">CrimeGuard Pro</div>
+          <div class="text-xs" style="opacity:.85">Legal Documents Center</div>
+        </div>
+      </div>
+      <div class="text-sm opacity-75">
+        <p>All documents link to official government and legal institution sources</p>
+        <p class="text-xs mt-1">© 2025 CrimeGuard Pro - Legal Resources Portal</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Legal Documents Database
+    const legalDocuments = [
+      {
+        id: 1,
+        title: "Indian Penal Code (IPC)",
+        description: "Complete text of the Indian Penal Code, 1860 - the main criminal code of India covering all substantive aspects of criminal law.",
+        category: "criminal",
+        source: "Ministry of Law and Justice",
+        url: "https://www.indiacode.nic.in/handle/123456789/2263",
+        icon: "⚖️",
+        tags: ["criminal law", "penal code", "crimes", "punishment"]
+      },
+      {
+        id: 2,
+        title: "Code of Criminal Procedure (CrPC)",
+        description: "The procedural law for administration of substantive criminal law in India. Contains procedures for investigation, trial, and punishment.",
+        category: "procedural",
+        source: "Ministry of Law and Justice",
+        url: "https://www.indiacode.nic.in/handle/123456789/2262",
+        icon: "📋",
+        tags: ["criminal procedure", "investigation", "trial", "procedure"]
+      },
+      {
+        id: 3,
+        title: "Indian Evidence Act, 1872",
+        description: "Law governing the admissibility of evidence in Indian courts. Defines what evidence may be given and in what manner.",
+        category: "procedural",
+        source: "Ministry of Law and Justice",
+        url: "https://www.indiacode.nic.in/handle/123456789/2187",
+        icon: "📖",
+        tags: ["evidence", "admissibility", "witness", "proof"]
+      },
+      {
+        id: 4,
+        title: "Constitution of India",
+        description: "The supreme law of India. Defines the political structure, procedures, powers, and duties of government institutions.",
+        category: "constitutional",
+        source: "Government of India",
+        url: "https://www.india.gov.in/my-government/constitution-india",
+        icon: "🏛️",
+        tags: ["constitution", "fundamental rights", "government", "supreme law"]
+      },
+      {
+        id: 5,
+        title: "Code of Civil Procedure (CPC)",
+        description: "Procedural law related to administration of civil proceedings in India. Governs the procedure to be followed in civil courts.",
+        category: "procedural",
+        source: "Ministry of Law and Justice",
+        url: "https://www.indiacode.nic.in/handle/123456789/2186",
+        icon: "📜",
+        tags: ["civil procedure", "civil courts", "litigation", "procedure"]
+      },
+      {
+        id: 6,
+        title: "Indian Contract Act, 1872",
+        description: "Regulates contracts in India. Defines the elements of a valid contract, breach of contract, and remedies available.",
+        category: "civil",
+        source: "Ministry of Law and Justice",
+        url: "https://www.indiacode.nic.in/handle/123456789/2185",
+        icon: "📝",
+        tags: ["contract", "agreement", "civil law", "commercial law"]
+      },
+      {
+        id: 7,
+        title: "Protection of Children from Sexual Offences (POCSO) Act",
+        description: "Comprehensive law to protect children from sexual assault, sexual harassment, and pornography.",
+        category: "criminal",
+        source: "Ministry of Women and Child Development",
+        url: "https://www.indiacode.nic.in/handle/123456789/2079",
+        icon: "🛡️",
+        tags: ["child protection", "sexual offences", "children", "safety"]
+      },
+      {
+        id: 8,
+        title: "Domestic Violence Act, 2005",
+        description: "An act to provide for more effective protection of the rights of women guaranteed under the Constitution who are victims of violence.",
+        category: "civil",
+        source: "Ministry of Women and Child Development",
+        url: "https://www.indiacode.nic.in/handle/123456789/2006",
+        icon: "💜",
+        tags: ["domestic violence", "women rights", "protection", "civil law"]
+      },
+      {
+        id: 9,
+        title: "Right to Information Act, 2005",
+        description: "Act to provide for setting out the practical regime of right to information for citizens to secure access to information.",
+        category: "constitutional",
+        source: "Department of Personnel and Training",
+        url: "https://rti.gov.in/",
+        icon: "🔍",
+        tags: ["RTI", "transparency", "information", "citizen rights"]
+      },
+      {
+        id: 10,
+        title: "Motor Vehicles Act, 1988",
+        description: "An act to consolidate and amend the law relating to motor vehicles and to provide for matters connected therewith.",
+        category: "civil",
+        source: "Ministry of Road Transport and Highways",
+        url: "https://www.indiacode.nic.in/handle/123456789/2264",
+        icon: "🚗",
+        tags: ["motor vehicles", "traffic", "licensing", "transport"]
+      },
+      {
+        id: 11,
+        title: "Narcotic Drugs and Psychotropic Substances Act",
+        description: "An act to consolidate and amend the law relating to narcotic drugs, to make stringent provisions for control and regulation.",
+        category: "criminal",
+        source: "Ministry of Finance",
+        url: "https://www.indiacode.nic.in/handle/123456789/2265",
+        icon: "🚫",
+        tags: ["drugs", "narcotics", "substances", "criminal law"]
+      },
+      {
+        id: 12,
+        title: "Consumer Protection Act, 2019",
+        description: "An act to provide for protection of the interests of consumers and for the said purpose, to establish authorities for timely and effective administration.",
+        category: "civil",
+        source: "Ministry of Consumer Affairs",
+        url: "https://www.indiacode.nic.in/handle/123456789/15676",
+        icon: "🛒",
+        tags: ["consumer protection", "consumer rights", "civil law", "protection"]
+      },
+      {
+        id: 13,
+        title: "Information Technology Act, 2000",
+        description: "An act to provide legal recognition for transactions carried out by means of electronic data interchange and other means of electronic communication.",
+        category: "civil",
+        source: "Ministry of Electronics and IT",
+        url: "https://www.indiacode.nic.in/handle/123456789/1999",
+        icon: "💻",
+        tags: ["IT act", "cyber law", "electronic", "digital"]
+      },
+      {
+        id: 14,
+        title: "Arms Act, 1959",
+        description: "An act to consolidate and amend the law relating to arms and ammunition and to provide for matters connected therewith.",
+        category: "criminal",
+        source: "Ministry of Home Affairs",
+        url: "https://www.indiacode.nic.in/handle/123456789/2266",
+        icon: "🔫",
+        tags: ["arms", "weapons", "licensing", "criminal law"]
+      },
+      {
+        id: 15,
+        title: "Hindu Marriage Act, 1955",
+        description: "An act to amend and codify the law relating to marriage among Hindus. Governs Hindu marriages, divorce, and related matters.",
+        category: "civil",
+        source: "Ministry of Law and Justice",
+        url: "https://www.indiacode.nic.in/handle/123456789/2267",
+        icon: "💒",
+        tags: ["marriage", "divorce", "family law", "civil law"]
+      },
+      {
+        id: 16,
+        title: "Prevention of Corruption Act, 1988",
+        description: "An act to consolidate and amend the law relating to the prevention of corruption and for matters connected therewith.",
+        category: "criminal",
+        source: "Ministry of Personnel, Public Grievances",
+        url: "https://www.indiacode.nic.in/handle/123456789/2268",
+        icon: "⚖️",
+        tags: ["corruption", "public servants", "criminal law", "prevention"]
+      },
+      {
+        id: 17,
+        title: "Right to Education Act, 2009",
+        description: "An act to provide for free and compulsory education to all children of the age of six to fourteen years.",
+        category: "constitutional",
+        source: "Ministry of Education",
+        url: "https://www.indiacode.nic.in/handle/123456789/2053",
+        icon: "📚",
+        tags: ["education", "rights", "children", "constitutional"]
+      },
+      {
+        id: 18,
+        title: "Environmental Protection Act, 1986",
+        description: "An act to provide for the protection and improvement of environment and for matters connected therewith.",
+        category: "civil",
+        source: "Ministry of Environment, Forest and Climate Change",
+        url: "https://www.indiacode.nic.in/handle/123456789/2269",
+        icon: "🌳",
+        tags: ["environment", "protection", "pollution", "civil law"]
+      }
+    ];
+
+    // DOM Elements
+    const $ = id => document.getElementById(id);
+    const searchInput = $('searchInput');
+    const documentsContainer = $('documentsContainer');
+    const noResults = $('noResults');
+    const categoryFilters = document.querySelectorAll('.category-filter');
+    const totalDocs = $('totalDocs');
+    const activeCategories = $('activeCategories');
+    const officialSources = $('officialSources');
+
+    // State
+    let currentCategory = 'all';
+    let searchQuery = '';
+
+    // Initialize
+    function init() {
+      updateStats();
+      renderDocuments();
+      setupEventListeners();
+    }
+
+    // Update Statistics
+    function updateStats() {
+      const categories = new Set(legalDocuments.map(doc => doc.category));
+      const sources = new Set(legalDocuments.map(doc => doc.source));
+      
+      totalDocs.textContent = legalDocuments.length;
+      activeCategories.textContent = categories.size;
+      officialSources.textContent = sources.size;
+    }
+
+    // Setup Event Listeners
+    function setupEventListeners() {
+      // Search input
+      searchInput.addEventListener('input', (e) => {
+        searchQuery = e.target.value.toLowerCase().trim();
+        renderDocuments();
+      });
+
+      // Category filters
+      categoryFilters.forEach(btn => {
+        btn.addEventListener('click', () => {
+          // Update active state
+          categoryFilters.forEach(b => {
+            if (b === btn) {
+              b.className = 'category-filter px-4 py-2 bg-accent-500 text-white rounded-lg font-semibold hover:bg-accent-600 transition';
+            } else {
+              b.className = 'category-filter px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition';
+            }
+          });
+          
+          currentCategory = btn.dataset.category;
+          renderDocuments();
+        });
+      });
+    }
+
+    // Filter Documents
+    function filterDocuments() {
+      return legalDocuments.filter(doc => {
+        // Category filter
+        if (currentCategory !== 'all' && doc.category !== currentCategory) {
+          return false;
+        }
+
+        // Search filter
+        if (searchQuery) {
+          const searchLower = searchQuery.toLowerCase();
+          const matchesTitle = doc.title.toLowerCase().includes(searchLower);
+          const matchesDescription = doc.description.toLowerCase().includes(searchLower);
+          const matchesTags = doc.tags.some(tag => tag.toLowerCase().includes(searchLower));
+          const matchesSource = doc.source.toLowerCase().includes(searchLower);
+          
+          if (!matchesTitle && !matchesDescription && !matchesTags && !matchesSource) {
+            return false;
+          }
+        }
+
+        return true;
+      });
+    }
+
+    // Render Documents
+    function renderDocuments() {
+      const filtered = filterDocuments();
+      
+      if (filtered.length === 0) {
+        documentsContainer.classList.add('hidden');
+        noResults.classList.remove('hidden');
+        return;
+      }
+
+      documentsContainer.classList.remove('hidden');
+      noResults.classList.add('hidden');
+
+      documentsContainer.innerHTML = filtered.map(doc => `
+        <div class="card doc-card cursor-pointer" onclick="openDocument('${doc.url}')">
+          <div class="flex items-start gap-4">
+            <div class="text-4xl flex-shrink-0">${doc.icon}</div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-start justify-between gap-2 mb-2">
+                <h3 class="text-lg font-bold text-primary-800 line-clamp-2">${escapeHtml(doc.title)}</h3>
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-accent-500 flex-shrink-0 external-link-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                </svg>
+              </div>
+              <p class="text-sm text-primary-600 mb-3 line-clamp-2">${escapeHtml(doc.description)}</p>
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-1 bg-primary-100 text-primary-700 rounded text-xs font-semibold">
+                    ${getCategoryLabel(doc.category)}
+                  </span>
+                </div>
+                <div class="text-xs text-primary-500 flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  ${escapeHtml(doc.source)}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Get Category Label
+    function getCategoryLabel(category) {
+      const labels = {
+        'criminal': 'Criminal Law',
+        'civil': 'Civil Law',
+        'constitutional': 'Constitutional',
+        'procedural': 'Procedural Law'
+      };
+      return labels[category] || category;
+    }
+
+    // Open Document (External Link)
+    function openDocument(url) {
+      // Open in new tab
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+
+    // Escape HTML
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+
+</body>
+</html>
+

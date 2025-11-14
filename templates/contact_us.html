@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact Us - CrimeGuard Pro</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #f8fafc;
+      color: #111827;
+      font-family: "Inter", sans-serif;
+    }
+    .card {
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header class="bg-white shadow-sm py-4 sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="/static/images/newlogo1.png" alt="CrimeGuard Pro" class="h-12">
+        <div>
+          <h1 class="font-bold text-lg">Contact Us</h1>
+        </div>
+      </div>
+      <a href="/home" class="text-sm text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg shadow">Home</a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="max-w-6xl mx-auto px-4 py-12 space-y-8">
+
+    <!-- Intro -->
+    <section class="card p-6">
+      <h2 class="text-xl font-semibold mb-2">We’re here to help 👋</h2>
+      <p class="text-gray-600">
+        Have questions or need technical assistance? Our support team is ready to help you with any issue regarding CrimeGuard Pro.
+      </p>
+    </section>
+
+    <!-- Contact Form + Info -->
+    <section class="grid md:grid-cols-2 gap-8">
+
+      <!-- Contact Form -->
+      <div class="card p-6">
+        <h3 class="text-lg font-semibold mb-4 text-indigo-700">Send us a message</h3>
+        <form id="contactForm" class="space-y-4">
+          <div>
+            <label for="name" class="block text-sm font-medium text-gray-700">Your Name</label>
+            <input type="text" id="name" name="name" required class="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+          </div>
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+            <input type="email" id="email" name="email" required class="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+          </div>
+          <div>
+            <label for="subject" class="block text-sm font-medium text-gray-700">Subject</label>
+            <input type="text" id="subject" name="subject" class="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500">
+          </div>
+          <div>
+            <label for="message" class="block text-sm font-medium text-gray-700">Message</label>
+            <textarea id="message" name="message" rows="4" required class="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+          </div>
+          <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-md transition">Send Message</button>
+        </form>
+        <p id="formMessage" class="text-sm text-green-600 mt-3 hidden">✅ Message sent successfully!</p>
+      </div>
+
+      <!-- Contact Info -->
+      <div class="card p-6">
+        <h3 class="text-lg font-semibold mb-4 text-indigo-700">Contact Information</h3>
+        <ul class="text-gray-700 space-y-3">
+          <li>📍 <strong>Headquarters:</strong> CrimeGuard Pro HQ, Police Tech Complex, Hyderabad, India</li>
+          <li>📧 <strong>Email:</strong> <a href="mailto:support@crimeguard.gov" class="text-indigo-600 hover:underline">support@crimeguard.gov</a></li>
+          <li>☎️ <strong>Phone:</strong> +91 1800-123-456</li>
+          <li>🕒 <strong>Working Hours:</strong> Monday–Friday, 9:00 AM – 6:00 PM</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-white py-12 mt-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+
+        <!-- Company Info -->
+        <div class="col-span-1 md:col-span-2">
+          <div class="flex items-center mb-4">
+            <svg class="h-8 w-8 text-white mr-3" viewBox="0 0 40 40" fill="currentColor"></svg>
+            <div>
+              <img src="/static/images/newlogo1.png" alt="CrimeGuard Pro" style="height: 100px; width: 250px;">
+            </div>
+          </div>
+          <p class="text-gray-300 mb-4">
+            Secure authentication gateway ensuring safe access to CrimeGuard Pro's comprehensive crime management ecosystem.
+          </p>
+        </div>
+
+        <!-- Quick Links -->
+        <div>
+          <h4 class="text-lg font-semibold mb-4 text-white">Quick Links</h4>
+          <ul class="space-y-2">
+           
+            <li><a href="/login" class="text-gray-300 hover:text-white transition">Login</a></li>
+            <li><a href="/help_center" class="text-gray-300 hover:text-white transition">Help Center</a></li>
+            <li><a href="/analytics" class="text-gray-300 hover:text-white transition">Analytics</a></li>
+          </ul>
+        </div>
+
+        <!-- Support -->
+        <div>
+          <h4 class="text-lg font-inter font-semibold mb-4">Support</h4>
+          <ul class="space-y-2">
+              <li><a href="/help_center" class="small-muted">Help Center</a>
+              </li>
+              <li><a href="/contact" class="text-primary-200 hover:text-white transition-smooth">Contact Us</a></li>
+              <li><a href="/privacy_policy" class="text-primary-200 hover:text-white transition-smooth">Privacy Policy</a></li>
+              <li><a href="/terms_of_service" class="text-primary-200 hover:text-white transition-smooth">Terms of Service</a></li>
+              <li><a href="/accessibility" class="text-primary-200 hover:text-white transition-smooth">Accessibility</a></li>
+          </ul>
+      </div>
+  </div>
+
+      <div class="border-t border-gray-700 mt-8 pt-8 text-center">
+        <p class="text-gray-400">
+          &copy; 2025 CrimeGuard Pro. All Rights Reserved. | Secure authentication for justice and transparency.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Simple JS for fake form submission -->
+  <script>
+    document.getElementById("contactForm").addEventListener("submit", function(e){
+      e.preventDefault();
+      document.getElementById("formMessage").classList.remove("hidden");
+      this.reset();
+    });
+  </script>
+</body>
+</html>
